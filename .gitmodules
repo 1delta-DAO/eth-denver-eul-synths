@@ -1,0 +1,3 @@
+[submodule "contracts/lib/evc-playground"]
+	path = contracts/lib/evc-playground
+	url = https://github.com/euler-xyz/evc-playground
