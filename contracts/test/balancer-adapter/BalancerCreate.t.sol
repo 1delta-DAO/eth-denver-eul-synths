@@ -163,12 +163,6 @@ contract BalancerCreateTest is Test, BalancerSepoliaAddresses {
             userData, // bytes userData;
             false // bool fromInternalBalance;
         );
-
-        // we get the right order from balancer
-        assets = new IAsset[](3);
-        assets[0] = IAsset(address(eUSD));
-        assets[1] = IAsset(address(USDC));
-        assets[2] = IAsset(address(DAI));
         // regular join and NO init
         balancerVault.joinPool(
             poolId, // bytes32 poolId,

@@ -1,2 +1,5 @@
 # foundry artifacts
 contracts/out/
+
+# foundry imports
+contracts/lib/
