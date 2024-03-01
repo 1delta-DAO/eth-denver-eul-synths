@@ -7,6 +7,7 @@ import LeverageSlider from "./Slider/LeverageSlider"
 import { useState } from "react"
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box } from "@chakra-ui/react"
 import { Pool, PoolAsset, payAssets } from "../src/constants"
+import { PoolDetailsVStack } from "./Pools"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -30,11 +31,11 @@ const Manager: React.FC<ManagerProps> = ({
         Create Position
       </Heading>
       <VStack
-        padding="0.5em"
-        background="#dddddd"
+        padding="1em"
+        background="#e7e7e7"
         borderRadius="0.5em"
         w="100%"
-        gap="0.5em"
+        gap="1em"
       >
         <HStack
           w="100%"
@@ -63,14 +64,14 @@ const Manager: React.FC<ManagerProps> = ({
               as={Button}
               rightIcon={<ChevronDownIcon />}
               minW="35%"
-              border="1px solid #dddddd"
+              border="1px solid #e7e7e7"
               background="transparent"
               _hover={{
-                background: "#dddddd",
+                background: "#e7e7e7",
               }}
               _active={{
                 outline: "none",
-                background: "#dddddd",
+                background: "#e7e7e7",
               }}
             >
               {
@@ -148,13 +149,32 @@ const Manager: React.FC<ManagerProps> = ({
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-              commodo consequat.
+            <PoolDetailsVStack
+              pool={selectedPool}
+              style={{
+                fontSize: "0.8em",
+                gap: "0.3em"
+              }}
+            />
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
+        <Button
+          w="100%"
+          background="black"
+          color="white"
+          _hover={{
+            background: "#2b2b2b",
+          }}
+          _active={{
+            background: "black",
+          }}
+          _focus={{
+            outline: "none",
+          }}
+        >
+          Create Position
+        </Button>
       </VStack>
     </VStack>
   )

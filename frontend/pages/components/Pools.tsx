@@ -3,6 +3,46 @@ import { Pool, pools } from "../src/constants"
 import { Avatar, Box, HStack, VStack, Text } from "@chakra-ui/react"
 import { formatNumber, formatRatioToPercent } from "../src/formatters"
 
+interface PoolDetailsVStackProps {
+  pool: Pool,
+  style?: React.CSSProperties
+}
+
+export const PoolDetailsVStack = ({
+  pool,
+  style
+}: PoolDetailsVStackProps) => {
+
+  return (
+    <VStack w="100%" style={style}>
+      <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
+        <Text>APR</Text>
+        <Text>{formatRatioToPercent(pool.apr)}</Text>
+      </HStack>
+      {
+        pool.stakingApr && (
+          <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
+            <Text>Staking APR</Text>
+            <Text>{formatRatioToPercent(pool.stakingApr)}</Text>
+          </HStack>
+        )
+      }
+      <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
+        <Text>TVL</Text>
+        <Text>${formatNumber(pool.tvl)}</Text>
+      </HStack>
+      {
+        pool.totalSupply && (
+          <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
+            <Text>Total Supply</Text>
+            <Text>{formatNumber(pool.totalSupply)}</Text>
+          </HStack>
+        )
+      }
+    </VStack>
+  )
+}
+
 interface PoolCardProps {
   isSelected: boolean,
   setPool: (pool: Pool) => void,
@@ -17,12 +57,12 @@ const PoolCard: React.FC<PoolCardProps> = ({
 
   return (
     <Box
-      p="0.5em"
+      p="1em"
       borderRadius="0.5em"
-      bg={isSelected ? "#eeeeee" : "#dddddd"}
+      bg={isSelected ? "#2b2b2b" : "#e7e7e7"}
       cursor={isSelected ? "default" : "pointer"}
       _hover={{
-        background: "#eeeeee",
+        background: "#2b2b2b",
         transform: isSelected ? "" : "scale(0.97)"
       }}
       transition="all 0.2s ease-in-out"
@@ -60,32 +100,9 @@ const PoolCard: React.FC<PoolCardProps> = ({
             }
           </HStack>
         </HStack>
-        <VStack w="100%">
-          <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
-            <Text>APR</Text>
-            <Text>{formatRatioToPercent(pool.apr)}</Text>
-          </HStack>
-          {
-            pool.stakingApr && (
-              <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
-                <Text>Staking APR</Text>
-                <Text>{formatRatioToPercent(pool.stakingApr)}</Text>
-              </HStack>
-            )
-          }
-          <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
-            <Text>TVL</Text>
-            <Text>${formatNumber(pool.tvl)}</Text>
-          </HStack>
-          {
-            pool.totalSupply && (
-              <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
-                <Text>Total Supply</Text>
-                <Text>{formatNumber(pool.totalSupply)}</Text>
-              </HStack>
-            )
-          }
-        </VStack>
+        <PoolDetailsVStack
+          pool={pool}
+        />
       </VStack>
     </Box>
   )
