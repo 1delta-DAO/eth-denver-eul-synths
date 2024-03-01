@@ -4,8 +4,14 @@ import styles from '../styles/Home.module.css';
 import Navbar from './components/Navbar';
 import Pools from './components/Pools';
 import Manager from './components/Manager';
+import { HStack } from '@chakra-ui/react';
+import { Pool, pools } from './src/constants';
+import { useState } from 'react';
 
 const Home: NextPage = () => {
+
+  const [pool, setPool] = useState<Pool>(pools[0]);
+
   return (
     <div>
       <Head>
@@ -19,14 +25,28 @@ const Home: NextPage = () => {
 
       <Navbar />
 
-      <main className='flex min-h-[100vh] w-full px-20 mt-6 gap-6'>
+      <HStack
+        minH='100vh'
+        w='100%'
+        maxW="1400px"
+        m="auto"
+        mt="2em"
+        gap="2em"
+        px="2em"
+        alignItems="flex-start"
+      >
         <div className='flex flex-col w-2/3'>
-          <Pools />
+          <Pools
+            selectedPool={pool}
+            setPool={setPool}
+          />
         </div>
         <div className='flex flex-col w-1/3'>
-          <Manager />
+          <Manager
+            selectedPool={pool}
+          />
         </div>
-      </main>
+      </HStack>
 
       <footer className={styles.footer}>
         <a href="https://rainbow.me" rel="noopener noreferrer" target="_blank">
