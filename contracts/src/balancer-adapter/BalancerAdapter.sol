@@ -146,7 +146,12 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         );
     }
 
-    function pullBalance() external {}
+    function doCheckAccountStatus(
+        address,
+        address[] calldata
+    ) internal view virtual {
+        // no need to do anything here because the vault does not allow borrowing
+    }
 
     /**
      * pulls funds from the caller;
@@ -156,11 +161,11 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         uint256 depositAmount,
         address vault,
         address recipient
-    ) external callThroughEVC returns (uint256) {
+    ) external callThroughEVC returns (uint256 bptAmountOrShares) {
         address sender = EVCUtil._msgSender();
         // pull assets
         IERC20(depositAsset).transferFrom(sender, address(this), depositAmount);
-        bool vaultProvided = vault == address(0);
+        bool vaultProvided = vault != address(0);
         address balancerPTRecipient = vaultProvided ? address(this) : recipient;
         uint256[] memory amountsToDeposit = fetchAmounts();
         bytes memory userData = abi.encode(
@@ -183,14 +188,18 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
             balancerPTRecipient, // address recipient,
             request // JoinPoolRequest memory request
         );
-
         IERC20 poolToken = IERC20(pool);
-        uint256 amountBPT = poolToken.balanceOf(address(this));
+        // fetch BPT balance
+        bptAmountOrShares = poolToken.balanceOf(address(this));
+
+        // deposit to vault for recipient if provided
         if (vaultProvided) {
-            IERC20(pool).approve(recipient, amountBPT);
-            return IMinimalVault(recipient).deposit(amountBPT, recipient);
-        } else {
-            return amountBPT;
+            poolToken.approve(vault, type(uint).max);
+            bptAmountOrShares = IMinimalVault(vault).deposit(
+                bptAmountOrShares,
+                recipient
+            );
+            poolToken.approve(vault, 0);
         }
     }
 
