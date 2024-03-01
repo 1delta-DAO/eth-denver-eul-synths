@@ -458,6 +458,7 @@ contract VaultMintableTest is Test {
         uint256 depositAmount = 50e18;
 
         // bob deposits collaterals, enables them, enables controller and borrows
+        IEVC.BatchItem[] memory items = new IEVC.BatchItem[](4);
         items[0] = IEVC.BatchItem({
             targetContract: address(evc),
             onBehalfOfAccount: address(0),
