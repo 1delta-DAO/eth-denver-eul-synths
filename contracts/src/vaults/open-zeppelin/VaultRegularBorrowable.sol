@@ -277,7 +277,7 @@ contract VaultRegularBorrowable is VaultSimple {
     /// @notice Borrows assets.
     /// @param assets The amount of assets to borrow.
     /// @param receiver The receiver of the assets.
-    function borrow(uint256 assets, address receiver) external callThroughEVC nonReentrant {
+    function borrow(uint256 assets, address receiver) external virtual callThroughEVC nonReentrant {
         address msgSender = _msgSenderForBorrow();
 
         createVaultSnapshot();
@@ -302,7 +302,7 @@ contract VaultRegularBorrowable is VaultSimple {
     /// @dev This function transfers the specified amount of assets from the caller to the vault.
     /// @param assets The amount of assets to repay.
     /// @param receiver The receiver of the repayment.
-    function repay(uint256 assets, address receiver) external callThroughEVC nonReentrant {
+    function repay(uint256 assets, address receiver) external virtual callThroughEVC nonReentrant {
         address msgSender = _msgSender();
 
         // sanity check: the receiver must be under control of the EVC. otherwise, we allowed to disable this vault as
