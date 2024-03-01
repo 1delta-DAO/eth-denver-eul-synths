@@ -19,7 +19,7 @@ const Home: NextPage = () => {
 
       <Navbar />
 
-      <main className='flex min-h-[100vh] w-full px-20 mt-4'>
+      <main className='flex min-h-[100vh] w-full px-20 mt-6 gap-6'>
         <div className='flex flex-col w-2/3'>
           <Pools />
         </div>
