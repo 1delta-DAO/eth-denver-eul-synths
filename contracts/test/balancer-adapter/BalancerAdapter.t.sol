@@ -3,13 +3,12 @@ pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import "forge-std/console.sol";
-import "evc/EthereumVaultConnector.sol";
-import "../../src/vaults/solmate/VaultSimple.sol";
 import {ICSPFactory, IRateProvider} from "../../src/balancer-adapter/interfaces/ICSPFactory.sol";
 import {IBalancerVaultGeneral, JoinPoolRequest, SingleSwap, SwapKind, FundManagement} from "../../src/balancer-adapter/interfaces/IVaultGeneral.sol";
 import {BalancerSepoliaAddresses} from "./BalancerSepoliaAddresses.sol";
 import {ChainLinkFeedAddresses} from "./ChainLinkFeedAddresses.sol";
 import {Fiat} from "../ERC20/Fiat.sol";
+import "evc/EthereumVaultConnector.sol";
 import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
 import {IBalancerPool} from "../../src/balancer-adapter/interfaces/IBalancerPool.sol";
 import {StablePoolUserData} from "../../src/balancer-adapter/interfaces/StablePoolUserData.sol";
@@ -22,12 +21,10 @@ contract BalancerAdapterTest is
     BalancerSepoliaAddresses,
     ChainLinkFeedAddresses
 {
-    IEVC _evc_;
-
     Fiat USDC;
     Fiat eUSD;
     Fiat DAI;
-
+    EthereumVaultConnector evc;
     BalancerAdapter balancerAdapter;
 
     ICSPFactory cspFactory;
@@ -56,7 +53,12 @@ contract BalancerAdapterTest is
         // balancer contracts
         cspFactory = ICSPFactory(CSP_FACTORY);
         balancerVault = IBalancerVaultGeneral(BALANCER_VAULT);
-        balancerAdapter = new BalancerAdapter(CSP_FACTORY, BALANCER_VAULT);
+        evc = new EthereumVaultConnector();
+        balancerAdapter = new BalancerAdapter(
+            CSP_FACTORY,
+            BALANCER_VAULT,
+            address(evc)
+        );
         console.log("adapter", address(balancerAdapter));
 
         balancerVault.setRelayerApproval(
@@ -138,6 +140,13 @@ contract BalancerAdapterTest is
         quote = balancerAdapter.getQuote(halfBalance, address(0), quoteAsset);
         console.log("quote in DAI", quote);
     }
+
+
+    // function test_evc() public {
+    //     create();
+    //     init();
+    //     joinPool();
+    // }
 
     function joinPool() internal {
         uint[] memory amounts = new uint256[](3);

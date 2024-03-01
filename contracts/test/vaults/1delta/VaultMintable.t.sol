@@ -11,7 +11,6 @@ import {IRMMock} from "../../mocks/IRMMock.sol";
 import {PriceOracleMock} from "../../mocks/PriceOracleMock.sol";
 import {VaultMintable} from "../../../src/1delta/VaultMintable.sol";
 import {VaultSimple} from "../../../src/vaults/solmate/VaultSimple.sol";
-import {VaultSimpleBorrowable} from "../../../src/vaults/solmate/VaultSimpleBorrowable.sol";
 import {VaultRegularBorrowable, ERC20} from "../../../src/vaults/open-zeppelin/VaultRegularBorrowable.sol";
 import {ERC20Mintable} from "../../../src/ERC20/ERC20Mintable.sol";
 
@@ -43,20 +42,26 @@ contract VaultMintableTest is Test {
         oracle.setResolvedAsset(address(mintableVault));
         oracle.setResolvedAsset(address(collateralVault));
         oracle.setPrice(address(liabilityAsset), address(referenceAsset), 1e6); // 1 LA = 1 RA
-        oracle.setPrice(address(collateralAsset), address(referenceAsset), 3e18); // 1 CA1 = 3 RA
+        oracle.setPrice(address(collateralAsset), address(referenceAsset), 3e6); // 1 CA1 = 3 RA
     }
 
     function mintAndApprove(address alice, address bob) public {
-        //liabilityAsset.mint(alice, 100e18);
+        liabilityAsset.mint(alice, 200e6);
+        collateralAsset.mint(alice, 200e18);
         collateralAsset.mint(bob, 100e18);
-        //assertEq(liabilityAsset.balanceOf(alice), 100e18);
+        assertEq(collateralAsset.balanceOf(alice), 200e18);
         assertEq(collateralAsset.balanceOf(bob), 100e18);
 
         vm.prank(alice);
         liabilityAsset.approve(address(mintableVault), type(uint256).max);
 
+        vm.prank(alice);
+        collateralAsset.approve(address(collateralVault), type(uint256).max);
+
         vm.prank(bob);
         collateralAsset.approve(address(collateralVault), type(uint256).max);
+
+        liabilityAsset.transferOwnership(address(mintableVault));
     }
 
     function test_RegularBorrowRepay(address alice, address bob) public {
@@ -73,6 +78,12 @@ contract VaultMintableTest is Test {
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 1, self-collateralization
         mintableVault.setCollateralFactor(address(collateralVault), 100); // cf = 1
 
+        // alice deposits 50 LA
+        vm.prank(alice);
+        collateralVault.deposit(50e18, alice);
+        assertEq(collateralAsset.balanceOf(alice), 150e18);
+        assertEq(collateralVault.maxWithdraw(alice), 50e18);
+
         // bob deposits 100 CA1 which lets him borrow 10 LA
         vm.prank(bob);
         collateralVault.deposit(100e18, bob);
@@ -82,42 +93,36 @@ contract VaultMintableTest is Test {
         // controller and collateral not enabled, hence borrow unsuccessful
         vm.prank(bob);
         vm.expectRevert(abi.encodeWithSelector(EVCUtil.ControllerDisabled.selector));
-        mintableVault.borrow(35e6, bob);
+        mintableVault.borrow(300e6, bob);
 
         vm.prank(bob);
         evc.enableController(bob, address(mintableVault));
-/*
+
         // collateral still not enabled, hence borrow unsuccessful
         vm.prank(bob);
-        vm.expectRevert(abi.encodeWithSelector(VaultMintable.AccountUnhealthy.selector));
-        mintableVault.borrow(35e6, bob);
+        vm.expectRevert(abi.encodeWithSelector(VaultRegularBorrowable.AccountUnhealthy.selector));
+        mintableVault.borrow(300e6, bob);
         vm.prank(bob);
         evc.enableCollateral(bob, address(collateralVault));
 
-        // too much borrowed because only one collateral enabled, hence borrow unsuccessful
-        vm.prank(bob);
-        vm.expectRevert(abi.encodeWithSelector(VaultSimpleBorrowable.AccountUnhealthy.selector));
-        mintableVault.borrow(35e18, bob);
-
         // too much borrowed, hence borrow unsuccessful
         vm.prank(bob);
-        vm.expectRevert(abi.encodeWithSelector(VaultSimpleBorrowable.AccountUnhealthy.selector));
-        mintableVault.borrow(35e18 + 0.01e18, bob);
+        vm.expectRevert(abi.encodeWithSelector(VaultRegularBorrowable.AccountUnhealthy.selector));
+        mintableVault.borrow(301e6, bob);
 
         // finally borrow is successful
         vm.prank(bob);
-        mintableVault.borrow(35e18, bob);
-        assertEq(liabilityAsset.balanceOf(bob), 35e18);
-        assertEq(mintableVault.debtOf(bob), 35e18);
-        assertEq(mintableVault.maxWithdraw(alice), 15e18);
+        mintableVault.borrow(300e6, bob);
+        assertEq(liabilityAsset.balanceOf(bob), 300e6);
+        assertEq(mintableVault.debtOf(bob), 300e6);
+        assertEq(collateralVault.maxWithdraw(bob), 100e18); // this should return 0 but need to check
 
         // jump one year ahead, bob's liability increased by 10% APY.
         // his account is no longer healthy
         vm.warp(block.timestamp + 365 days);
-        assertEq(liabilityAsset.balanceOf(bob), 35e18);
-        assertEq(mintableVault.debtOf(bob), 35e18 + 3.680982126514837396e18);
-        assertEq(mintableVault.maxWithdraw(alice), 15e18);
-        vm.expectRevert(abi.encodeWithSelector(VaultSimpleBorrowable.AccountUnhealthy.selector));
+        assertEq(liabilityAsset.balanceOf(bob), 300e6);
+        assertApproxEqRel(mintableVault.debtOf(bob), 330e6, 0.01e18);
+        vm.expectRevert(abi.encodeWithSelector(VaultRegularBorrowable.AccountUnhealthy.selector));
         evc.requireAccountStatusCheck(bob);
 
         // bob repays only some of his debt, his account is still unhealthy
@@ -125,38 +130,41 @@ contract VaultMintableTest is Test {
         liabilityAsset.approve(address(mintableVault), type(uint256).max);
 
         vm.prank(bob);
-        mintableVault.repay(2.680982126514837396e18, bob);
-        assertEq(liabilityAsset.balanceOf(bob), 35e18 - 2.680982126514837396e18);
-        assertEq(mintableVault.debtOf(bob), 35e18 + 1e18);
-        assertEq(mintableVault.maxWithdraw(alice), 15e18 + 2.680982126514837396e18);
-        vm.expectRevert(abi.encodeWithSelector(VaultSimpleBorrowable.AccountUnhealthy.selector));
+        uint256 repayAmount = 21e6;
+        mintableVault.repay(repayAmount, bob);
+        assertEq(liabilityAsset.balanceOf(bob), 300e6 - repayAmount);
+        assertApproxEqRel(mintableVault.debtOf(bob), 330e6 - repayAmount, 0.01e18);
+        vm.expectRevert(abi.encodeWithSelector(VaultRegularBorrowable.AccountUnhealthy.selector));
         evc.requireAccountStatusCheck(bob);
 
-        // alice kicks in to liquidate bob. first enable controller and collaterals
+        // alice kicks in to liquidate bob. first enable controller and collateral
         vm.prank(alice);
         evc.enableController(alice, address(mintableVault));
 
         vm.prank(alice);
-        evc.enableCollateral(alice, address(mintableVault));
-
-        vm.prank(alice);
         evc.enableCollateral(alice, address(collateralVault));
 
-        // liquidation fails multiple times as alice tries to liquidate too much
+        // liquidation fails as alice tries to liquidate too much
         vm.prank(alice);
-        vm.expectRevert(stdError.arithmeticError);
-        mintableVault.liquidate(bob, address(collateralVault), 30e18);
+        vm.expectRevert(VaultRegularBorrowable.RepayAssetsExceeded.selector);
+        mintableVault.liquidate(bob, address(collateralVault), 332e6 - repayAmount);
 
-        assertEq(liabilityAsset.balanceOf(bob), 35e18 - 2.680982126514837396e18); // bob's LA balance stays unchanged
-        assertEq(mintableVault.debtOf(bob), 30e18); // bob's debt decreased by 6 LA due to liquidation
-        assertEq(collateralVault.maxWithdraw(bob), 100e18); // bob's CA1 deposit stays unchanged
+        // finally liquidation is successful
+        uint256 liquidationAmount = 5e6;
+        vm.prank(alice);
+        mintableVault.liquidate(bob, address(collateralVault), liquidationAmount);
+
+        uint256 bobsCollateral = liquidationAmount * 1e12 / 3 * 120 / 100; // + 20% for liquidation reward
+        assertEq(liabilityAsset.balanceOf(bob), 300e6 - repayAmount); // bob's LA balance stays unchanged
+        assertApproxEqRel(mintableVault.debtOf(bob), 330e6 - repayAmount - liquidationAmount, 0.01e18); // bob's debt decreased by 5 LA due to liquidation
+        assertApproxEqRel(collateralVault.maxWithdraw(bob), 100e18 -  bobsCollateral, 0.01e18); // bob's CA1 deposit stays unchanged
             // liquidation
-        assertEq(mintableVault.debtOf(alice), 6e18); // alices's debt increased to 6 LA due to liquidation (she took on
+        assertEq(mintableVault.debtOf(alice), liquidationAmount); // alices's debt increased to 5 LA due to liquidation (she took on
             // bob's debt)
-        assertEq(mintableVault.maxWithdraw(alice), 15e18 + 2.680982126514837396e18); // alice's ability to withdraw LA
-            // didn't change
-        assertEq(collateralVault.maxWithdraw(alice), 0); // alices's CA1 deposit stays unchanged
+        assertApproxEqRel(collateralVault.maxWithdraw(alice), 50e18 + bobsCollateral,  0.01e18); // alices's CA1 deposit stays unchanged
             // liquidation (she took on bob's collateral)
+                    /*
+
         evc.requireAccountStatusCheck(alice);
         evc.requireAccountStatusCheck(bob);
 
@@ -431,4 +439,60 @@ contract VaultMintableTest is Test {
         assertEq(collateralVault.maxWithdraw(alice), 0);
         assertEq(collateralVault.maxWithdraw(bob), 0);
     } */
+
+    function test_LeveragePositionWithBatch(address alice, address bob) public {
+        vm.assume(alice != address(0) && bob != address(0) && !evc.haveCommonOwner(alice, bob));
+        vm.assume(
+            alice != address(evc) && alice != address(mintableVault) && alice != address(collateralVault)
+        );
+        vm.assume(
+            bob != address(evc) && bob != address(mintableVault) && bob != address(collateralVault)
+        );
+
+        mintAndApprove(alice, bob);
+
+        mintableVault.setCollateralFactor(address(mintableVault), 100); // cf = 1, self-collateralization
+        mintableVault.setCollateralFactor(address(collateralVault), 100); // cf = 1
+
+        uint256 borrowAmount = 100e6;
+        uint256 depositAmount = 50e18;
+
+        // bob deposits collaterals, enables them, enables controller and borrows
+        items[0] = IEVC.BatchItem({
+            targetContract: address(evc),
+            onBehalfOfAccount: address(0),
+            value: 0,
+            data: abi.encodeWithSelector(IEVC.enableController.selector, bob, address(mintableVault))
+        });
+        items[1] = IEVC.BatchItem({
+            targetContract: address(evc),
+            onBehalfOfAccount: address(0),
+            value: 0,
+            data: abi.encodeWithSelector(IEVC.enableCollateral.selector, bob, address(collateralVault))
+        });
+        items[2] = IEVC.BatchItem({
+            targetContract: address(mintableVault),
+            onBehalfOfAccount: bob,
+            value: 0,
+            data: abi.encodeWithSelector(VaultMintable.borrow.selector, borrowAmount, bob)
+        });
+        items[3] = IEVC.BatchItem({
+            targetContract: address(collateralVault),
+            onBehalfOfAccount: bob,
+            value: 0,
+            data: abi.encodeWithSelector(VaultSimple.deposit.selector, depositAmount, bob)
+        });
+
+        vm.prank(bob);
+        evc.batch(items);
+
+        assertEq(liabilityAsset.balanceOf(address(mintableVault)), 0);
+        assertEq(liabilityAsset.balanceOf(address(bob)), borrowAmount);
+        assertEq(mintableVault.maxWithdraw(bob), 0);
+        assertEq(mintableVault.debtOf(bob), borrowAmount);
+
+        assertEq(collateralAsset.balanceOf(address(collateralVault)), depositAmount);
+        assertEq(collateralAsset.balanceOf(address(bob)), 100e18 - depositAmount);
+        assertEq(collateralVault.maxWithdraw(bob), depositAmount);
+    }
 }

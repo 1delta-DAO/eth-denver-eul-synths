@@ -7,8 +7,10 @@ import {IBalancerVaultGeneral, JoinPoolRequest, SingleSwap, SwapKind, FundManage
 import {StablePoolUserData} from "./interfaces/StablePoolUserData.sol";
 import {IBalancerPool} from "./interfaces/IBalancerPool.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
+import {IMinimalVault} from "./interfaces/IMinimalVault.sol";
+import "../../lib/ethereum-vault-connector/src/utils/EVCUtil.sol";
 
-contract BalancerAdapter is IPriceOracle {
+contract BalancerAdapter is IPriceOracle, EVCUtil {
     address public pool;
     bytes32 public poolId;
 
@@ -20,6 +22,7 @@ contract BalancerAdapter is IPriceOracle {
     uint256[] decimalScales;
     address[] oracles;
     address[] pooledTokensClean;
+    uint256 BALANCER_ASSET_LENGTH;
     // sorted like balaner
     uint256[] balancerScalingFactors;
     address[] balancerRateProviders;
@@ -32,7 +35,11 @@ contract BalancerAdapter is IPriceOracle {
     uint256 constant PRICE_SCALE = 1e18;
     uint256 constant BPT_SCALE = 1e18;
 
-    constructor(address _cspFactory, address _balancerVault) {
+    constructor(
+        address _cspFactory,
+        address _balancerVault,
+        address evc
+    ) EVCUtil(IEVC(evc)) {
         cspFactory = _cspFactory;
         balancerVault = _balancerVault;
         SUPPLY_DOWNCALING = 1;
@@ -61,7 +68,7 @@ contract BalancerAdapter is IPriceOracle {
             owner, // address owner,
             0x0 // bytes32 salt
         );
-
+        BALANCER_ASSET_LENGTH = tokens.length;
         balancerRateProviders = IBalancerPool(pool).getRateProviders();
         poolId = IBalancerPool(pool).getPoolId();
 
@@ -137,6 +144,54 @@ contract BalancerAdapter is IPriceOracle {
             recipient, // address recipient,
             request // JoinPoolRequest memory request
         );
+    }
+
+    function pullBalance() external {}
+
+    /**
+     * pulls funds from the caller;
+     */
+    function facilitateLeveragedDeposit(
+        address depositAsset,
+        uint256 depositAmount,
+        address vault,
+        address recipient
+    ) external callThroughEVC returns (uint256) {
+        address sender = EVCUtil._msgSender();
+        // pull assets
+        IERC20(depositAsset).transferFrom(sender, address(this), depositAmount);
+        bool vaultProvided = vault == address(0);
+        address balancerPTRecipient = vaultProvided ? address(this) : recipient;
+        uint256[] memory amountsToDeposit = fetchAmounts();
+        bytes memory userData = abi.encode(
+            StablePoolUserData.JoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT,
+            // these are the balances to be drawn
+            amountsToDeposit,
+            uint256(0)
+        );
+        JoinPoolRequest memory request = JoinPoolRequest(
+            pooledTokens, // IAsset[] assets;
+            fillWith(type(uint).max, 4), // uint256[] maxAmountsIn;
+            userData, // bytes userData;
+            false // bool fromInternalBalance;
+        );
+
+        // regular join and NO init
+        IBalancerVaultGeneral(balancerVault).joinPool(
+            poolId, // bytes32 poolId,
+            address(this), // address sender,
+            balancerPTRecipient, // address recipient,
+            request // JoinPoolRequest memory request
+        );
+
+        IERC20 poolToken = IERC20(pool);
+        uint256 amountBPT = poolToken.balanceOf(address(this));
+        if (vaultProvided) {
+            IERC20(pool).approve(recipient, amountBPT);
+            return IMinimalVault(recipient).deposit(amountBPT, recipient);
+        } else {
+            return amountBPT;
+        }
     }
 
     // implements the oracles for vaults
@@ -241,6 +296,37 @@ contract BalancerAdapter is IPriceOracle {
             }
         }
         SUPPLY_DOWNCALING = downscaler;
+    }
+
+    // organize unordered assets array for balaner parametrization
+    function parametrizeBalancerInput(
+        address[] memory assetsUnsorted,
+        uint[] memory amountsUnsorted
+    ) internal view returns (uint256[] memory amountsSorted) {
+        amountsSorted = new uint256[](BALANCER_ASSET_LENGTH);
+        require(
+            assetsUnsorted.length == amountsUnsorted.length,
+            "Length Mismatch"
+        );
+        for (uint i; i < assetsUnsorted.length; i++) {
+            uint8 index = tokenToIndex[assetsUnsorted[i]];
+            amountsSorted[index] = amountsUnsorted[i];
+        }
+    }
+
+    // fetch amounts in this contract for balaner parametrization
+    function fetchAmounts()
+        internal
+        view
+        returns (uint256[] memory amountsSorted)
+    {
+        uint256 assetLength = BALANCER_ASSET_LENGTH;
+        amountsSorted = new uint256[](BALANCER_ASSET_LENGTH);
+        for (uint i; i < assetLength; i++) {
+            amountsSorted[i] = IERC20(pooledTokensClean[i]).balanceOf(
+                address(this)
+            );
+        }
     }
 
     function createArr4(
