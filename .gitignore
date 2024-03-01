@@ -5,4 +5,4 @@ contracts/cache/*
 contracts/out/*
 
 # foundry imports
-contracts/lib/*
+# contracts/lib/*

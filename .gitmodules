@@ -1,12 +1,12 @@
 [submodule "contracts/lib/evc-playground"]
 	path = contracts/lib/evc-playground
 	url = https://github.com/euler-xyz/evc-playground
-[submodule "contracts/lib/forge-std"]
-	path = lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
 [submodule "contracts/lib/solmate"]
 	path = lib/solmate
 	url = https://github.com/transmissions11/solmate
+[submodule "contracts/lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
 [submodule "contracts/lib/erc4626-tests"]
 	path = lib/erc4626-tests
 	url = https://github.com/a16z/erc4626-tests
