@@ -2,8 +2,13 @@
 
 pragma solidity ^0.8.19;
 
-import "../vaults/open-zeppelin/VaultRegularBorrowable.sol";
-import "../ERC20/ERC20Mintable.sol";
+import {VaultRegularBorrowable, ERC20} from "../vaults/open-zeppelin/VaultRegularBorrowable.sol";
+import {ERC20Mintable} from "../ERC20/ERC20Mintable.sol";
+//import {ERC20} from "openzeppelin/token/ERC20/ERC20.sol";
+//import {ERC20} from "solmate/tokens/ERC20.sol";
+import {IEVC} from "../utils/EVCClient.sol";
+import {IIRM} from "../interfaces/IIRM.sol";
+import {IPriceOracle} from "../interfaces/IPriceOracle.sol";
 
 /// @title VaultMintable
 /// @notice This contract extends VaultSimpleBorrowable with additional features like interest rate accrual and
@@ -12,7 +17,7 @@ contract VaultMintable is VaultRegularBorrowable {
 
     constructor(
         IEVC _evc,
-        ERC20 _asset,
+        ERC20Mintable _asset,
         IIRM _irm,
         IPriceOracle _oracle,
         ERC20 _referenceAsset,
@@ -59,7 +64,7 @@ contract VaultMintable is VaultRegularBorrowable {
 
         require(assets != 0, "ZERO_ASSETS");
 
-        ERC20Burnable(asset()).burnFrom(msgSender, assets);
+        ERC20Mintable(asset()).burnFrom(msgSender, assets);
 
         _totalAssets += assets;
 
