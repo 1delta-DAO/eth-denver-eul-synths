@@ -11,4 +11,8 @@ interface IBalancerPool is IERC20 {
     function getPoolId() external view returns (bytes32);
 
     function getScalingFactors() external view returns (uint256[] memory);
+
+    function getRateProviders() external view returns (address[] memory);
+
+    function getActualSupply() external view returns (uint256);
 }
