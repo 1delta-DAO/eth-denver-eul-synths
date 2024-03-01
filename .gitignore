@@ -1,5 +1,8 @@
+# cache
+contracts/cache/*
+
 # foundry artifacts
-contracts/out/
+contracts/out/*
 
 # foundry imports
-contracts/lib/
+contracts/lib/*
