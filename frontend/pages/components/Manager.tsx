@@ -6,10 +6,15 @@ import { ChevronDownIcon } from "@chakra-ui/icons"
 import LeverageSlider from "./Slider/LeverageSlider"
 import { useState } from "react"
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box } from "@chakra-ui/react"
-import { PoolAsset, payAssets } from "../src/constants"
-import Image from "next/image"
+import { Pool, PoolAsset, payAssets } from "../src/constants"
 
-const Manager = () => {
+interface ManagerProps {
+  selectedPool: Pool
+}
+
+const Manager: React.FC<ManagerProps> = ({
+  selectedPool
+}: ManagerProps) => {
 
   const [leverage, setLeverage] = useState(1)
   const [inputValue, setInputValue] = useState<string>("")
@@ -51,6 +56,7 @@ const Manager = () => {
             h="fit-content"
             fontSize="1.5em"
             placeholder="Insert Amount"
+            cursor="pointer"
           />
           <Menu>
             <MenuButton
@@ -114,9 +120,18 @@ const Manager = () => {
           >
             {outputValue}
           </Box>
-          <div>
-            USD-3Pool
-          </div>
+          <HStack>
+            {
+              selectedPool.assets.map((asset, index) => (
+                <Avatar
+                  key={index}
+                  src={asset.icon}
+                  name={asset.name}
+                  size="xs"
+                />
+              ))
+            }
+          </HStack>
         </HStack>
         <Accordion w="100%" allowToggle defaultIndex={[0]} background="white" border="none" borderRadius="0.5em">
           <AccordionItem border="none">
