@@ -1,10 +1,13 @@
+import { Heading } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const Navbar = () => {
   return (
-    <div className='w-full p-5 flex justify-between'>
+    <div className='w-full px-10 py-6 flex justify-between'>
       <div>
-        <h1 className='text-2xl font-bold'>eSynths</h1>
+        <Heading as='h1' size='xl' fontWeight={300}>
+          eSynths
+        </Heading>
       </div>
       <ConnectButton />
     </div>

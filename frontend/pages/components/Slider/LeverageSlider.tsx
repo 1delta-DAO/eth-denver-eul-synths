@@ -13,10 +13,9 @@ const SliderContainer = ({
       w="100%"
       p="0.75rem"
       gap="0.75rem"
-      bg="transparent"
-      border="1px solid black"
       borderRadius="0.5rem"
       style={style}
+      background="white"
     >
       {children}
     </VStack>

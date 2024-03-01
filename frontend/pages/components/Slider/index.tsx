@@ -61,7 +61,7 @@ const DecimalSlider: React.FC<DecimalSliderProps> = ({ value, onChange, ...props
           ))
         }
       <SliderMark value={max} zIndex={1} {...labelStyles} />
-      <SliderTrack height="0.3rem" bgColor="#d9d9d9">
+      <SliderTrack height="2px" bgColor="#d9d9d9">
         <SliderFilledTrack bgColor="black" />
       </SliderTrack>
       <Tooltip
