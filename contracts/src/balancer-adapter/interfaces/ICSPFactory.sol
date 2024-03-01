@@ -25,3 +25,18 @@ interface ICSPFactory {
         bytes32 salt
     ) external returns (address);
 }
+
+interface ICSPFactoryGeneral {
+    function create(
+        string memory name,
+        string memory symbol,
+        address[] memory tokens,
+        uint256 amplificationParameter,
+        address[] memory rateProviders,
+        uint256[] memory tokenRateCacheDurations,
+        bool exemptFromYieldProtocolFeeFlag,
+        uint256 swapFeePercentage,
+        address owner,
+        bytes32 salt
+    ) external returns (address);
+}
