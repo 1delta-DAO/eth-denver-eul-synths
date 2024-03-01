@@ -3,18 +3,18 @@ pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import "forge-std/console.sol";
-import "evc/EthereumVaultConnector.sol";
-import "../../src/vaults/solmate/VaultSimple.sol";
 import {ICSPFactory, IRateProvider} from "../../src/balancer-adapter/interfaces/ICSPFactory.sol";
 import {IBalancerVaultGeneral, JoinPoolRequest, SingleSwap, SwapKind, FundManagement} from "../../src/balancer-adapter/interfaces/IVaultGeneral.sol";
 import {BalancerSepoliaAddresses} from "./BalancerSepoliaAddresses.sol";
 import {ChainLinkFeedAddresses} from "./ChainLinkFeedAddresses.sol";
 import {Fiat} from "../ERC20/Fiat.sol";
+import "evc/EthereumVaultConnector.sol";
 import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
 import {IBalancerPool} from "../../src/balancer-adapter/interfaces/IBalancerPool.sol";
 import {StablePoolUserData} from "../../src/balancer-adapter/interfaces/StablePoolUserData.sol";
-import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
+import {BalancerAdapter, IMinimalVault} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {WrappedRateProvider} from "../../src/balancer-adapter/WrappedRateProvider.sol";
+import {MockVault} from "./MockVault.sol";
 
 // run via `forge test -vv --match-test "create"`
 contract BalancerAdapterTest is
@@ -22,17 +22,15 @@ contract BalancerAdapterTest is
     BalancerSepoliaAddresses,
     ChainLinkFeedAddresses
 {
-    IEVC _evc_;
-
     Fiat USDC;
     Fiat eUSD;
     Fiat DAI;
-
+    EthereumVaultConnector evc;
     BalancerAdapter balancerAdapter;
 
     ICSPFactory cspFactory;
     IBalancerVaultGeneral balancerVault;
-
+    address userVault;
     uint256 constant MAX_VAL = type(uint).max;
 
     // we use this to track all deposits for stables (with 18 decimals)
@@ -56,7 +54,13 @@ contract BalancerAdapterTest is
         // balancer contracts
         cspFactory = ICSPFactory(CSP_FACTORY);
         balancerVault = IBalancerVaultGeneral(BALANCER_VAULT);
-        balancerAdapter = new BalancerAdapter(CSP_FACTORY, BALANCER_VAULT);
+        evc = new EthereumVaultConnector();
+        console.log("EVC", address(evc));
+        balancerAdapter = new BalancerAdapter(
+            CSP_FACTORY,
+            BALANCER_VAULT,
+            address(evc)
+        );
         console.log("adapter", address(balancerAdapter));
 
         balancerVault.setRelayerApproval(
@@ -137,6 +141,41 @@ contract BalancerAdapterTest is
         halfBalance = balance / 2;
         quote = balancerAdapter.getQuote(halfBalance, address(0), quoteAsset);
         console.log("quote in DAI", quote);
+    }
+
+    function test_adapter_evc() public {
+        create();
+        init();
+        joinPool();
+
+        userVault = address(
+            new MockVault(balancerAdapter.pool(), address(evc))
+        );
+        IEVC.BatchItem[] memory items = new IEVC.BatchItem[](1);
+        // parameters for adapter
+        address depositAsset = address(USDC);
+        uint256 depositAmount = 10.0e6;
+        address vault = userVault;
+        address recipient = address(this);
+        
+        // item definition
+        items[0] = IEVC.BatchItem({
+            targetContract: address(balancerAdapter),
+            onBehalfOfAccount: address(this),
+            value: 0,
+            data: abi.encodeWithSelector(
+                BalancerAdapter.facilitateLeveragedDeposit.selector,
+                depositAsset,
+                depositAmount,
+                vault,
+                recipient
+            )
+        });
+        USDC.approve(address(balancerAdapter), type(uint).max);
+        evc.batch(items);
+        uint shares = MockVault(userVault).shares(address(this));
+        console.log("shares", shares);
+        assert(MockVault(userVault).shares(address(this)) > 0);
     }
 
     function joinPool() internal {
