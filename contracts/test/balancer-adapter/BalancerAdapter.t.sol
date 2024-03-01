@@ -79,20 +79,27 @@ contract BalancerAdapterTest is
         uint[] memory amounts = new uint256[](3);
         address adapter = address(balancerAdapter);
 
-        uint eusdAmount = 1_200e18;
+        uint eusdAmount = 1_200.0e18;
         amounts[0] = eusdAmount;
         eUSD.transfer(adapter, eusdAmount);
 
-        uint usdcAmount = 1_020e6;
+        uint usdcAmount = 1_020.0e6;
         amounts[1] = usdcAmount;
         USDC.transfer(adapter, usdcAmount);
 
-        uint daiAmount = 900e18;
+        uint daiAmount = 900.0e18;
         amounts[2] = daiAmount;
         DAI.transfer(adapter, daiAmount);
         console.log("join");
+        address pool = balancerAdapter.pool();
+        uint balance = IERC20(pool).balanceOf(address(this));
         // deposit balances to pool
         balancerAdapter.depositTo(amounts, address(this));
+
+        balance = IERC20(pool).balanceOf(address(this)) - balance;
+        console.log(balance);
+        // we assert that enough BPTs were minted
+        assert(balance >= 215105030921280412);
     }
 
     function init() private {
@@ -101,7 +108,7 @@ contract BalancerAdapterTest is
         address adapter = address(balancerAdapter);
 
         uint eusdAmount = 10.0e18;
-        amounts[0] = eusdAmount;
+        amounts[1] = eusdAmount;
         eUSD.transfer(adapter, eusdAmount);
 
         uint usdcAmount = 10.0e6;
