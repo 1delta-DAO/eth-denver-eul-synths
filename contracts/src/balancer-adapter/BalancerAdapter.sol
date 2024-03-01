@@ -28,7 +28,7 @@ contract BalancerAdapter {
         {
             uint256[] memory tokenRateCacheDurations = new uint256[](3);
             uint256 amplificationParameter = 2000;
-            uint256 swapFeePercentage = 0.0001e18;
+            uint256 swapFeePercentage = 0.0003e18; // 3 bp fee
             bool exemptFromYieldProtocolFeeFlag = true;
             address owner = address(this);
             pool = ICSPFactoryGeneral(cspFactory).create(
