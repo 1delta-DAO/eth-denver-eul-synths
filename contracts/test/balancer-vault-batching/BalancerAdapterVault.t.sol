@@ -46,7 +46,7 @@ contract BalancerAdapterVaultTest is
     function setUp() public {
         vm.createSelectFork({
             blockNumber: 5_388_756,
-            urlOrAlias: "https://rpc.ankr.com/eth_sepolia"
+            urlOrAlias: "https://eth-sepolia.public.blastapi.io"
         });
 
         // stablecoins creation, they already mint to the caller
