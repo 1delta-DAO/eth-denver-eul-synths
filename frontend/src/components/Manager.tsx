@@ -73,7 +73,7 @@ const Manager: React.FC<ManagerProps> = ({
       if (approved && account.address) {
         const depo = Number(inputValue ?? '0')
         setTxLoading(true)
-        await batch(depo, (leverage - 1) * depo, payAsset)
+        await batch(depo, (leverage - 1) * depo, payAsset, selectedPool.assets[1])
         setTxLoading(false)
       }
     }

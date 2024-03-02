@@ -22,7 +22,7 @@ const useCallBatch = () => {
   const vaultInterface = MintableVault__factory.createInterface()
   const evcInterface = EVC__factory.createInterface()
 
-  return async (depositAmount: number, borrowAmount: number, assetObj: PoolAsset) => {
+  return async (depositAmount: number, borrowAmount: number, assetObj: PoolAsset, debtAsset: PoolAsset) => {
     const symbol = assetObj.symbol
     const asset = symbolToAsset[symbol as keyof typeof symbolToAsset]
     if (!asset?.address) return;
@@ -44,12 +44,12 @@ const useCallBatch = () => {
     )
 
     const callVault = vaultInterface.encodeFunctionData('borrow', [
-      parseUnits(borrowAmount.toString(), assetObj?.decimals ?? 18),
+      parseUnits(borrowAmount.toString(), debtAsset?.decimals ?? 18),
       DEPLOYED_ADAPTER
     ])
     const callBalancer = balancerInterface.encodeFunctionData('facilitateLeveragedDeposit', [
       asset.address, // address depositAsset,
-      parseUnits(depositAmount.toString(), assetObj?.decimals ?? 18), // uint256 depositAmount,
+      parseUnits(depositAmount.toString(), asset?.decimals ?? 18), // uint256 depositAmount,
       COLLATERAL_VAULT, // address vault,
       recipient // address recipient
     ])
