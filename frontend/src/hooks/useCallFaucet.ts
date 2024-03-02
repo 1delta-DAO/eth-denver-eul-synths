@@ -1,8 +1,8 @@
 import { useAccount, useClient, useWriteContract } from "wagmi"
 import { sepolia } from "viem/chains"
-import { DEPLOYED_DEPLOYER, symbolToAsset } from "../src/constants"
+import { DEPLOYED_DEPLOYER, symbolToAsset } from "../constants"
 import { waitForTransactionReceipt } from "viem/actions"
-import { eulSynthsAbi } from "../src/abis/EulSynths"
+import { eulSynthsAbi } from "../abis/EulSynths"
 
 export const useFaucet = () => {
 
@@ -15,7 +15,7 @@ export const useFaucet = () => {
   if (!account) return () => null
 
   return async (symbol: string) => {
-    const asset = symbolToAsset(symbol)
+    const asset = symbolToAsset[symbol as keyof typeof symbolToAsset]
     if (!asset?.address) return;
 
     try {

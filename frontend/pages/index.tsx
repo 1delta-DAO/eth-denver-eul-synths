@@ -1,13 +1,13 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import Navbar from './components/Navbar';
-import Pools from './components/Pools';
-import Manager from './components/Manager';
+import Navbar from '../src/components/Navbar';
+import Pools from '../src/components/Pools';
+import Manager from '../src/components/Manager';
 import { HStack } from '@chakra-ui/react';
-import { Pool, pools } from './src/constants';
+import { Pool, pools } from '../src/constants';
 import { useState } from 'react';
-import { useFetchPrices } from './hooks/useFetchPrices';
+import { useFetchPrices } from '../src/hooks/useFetchPrices';
 
 const Home: NextPage = () => {
 

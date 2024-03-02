@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "typechain": "typechain --target ethers-v6 --out-dir pages/src/abis/types \"./pages/src/abis/json/**/*.json\"",
-    "build": "next build",
+    "build": "npm run typechain && next build",
     "start": "next start",
     "lint": "next lint"
   },

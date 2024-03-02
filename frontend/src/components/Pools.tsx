@@ -1,7 +1,7 @@
 import { Grid, Heading } from "@chakra-ui/layout"
-import { Pool, dexs, pools } from "../src/constants"
+import { Pool, dexs, pools } from "../constants"
 import { Avatar, Box, HStack, VStack, Text } from "@chakra-ui/react"
-import { formatNumber, formatRatioToPercent } from "../src/formatters"
+import { formatNumber, formatRatioToPercent } from "../formatters"
 
 interface PoolDetailsVStackProps {
   pool: Pool,

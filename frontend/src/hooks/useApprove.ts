@@ -1,8 +1,8 @@
 import { useAccount, useReadContract, useWriteContract, useClient } from "wagmi"
-import { DEPLOYED_ADAPTER, approveAndAllowanceAbi, symbolToAsset } from "../src/constants"
+import { DEPLOYED_ADAPTER, approveAndAllowanceAbi, symbolToAsset } from "../constants"
 import { sepolia } from "viem/chains"
 import { waitForTransactionReceipt } from "viem/actions"
-import { parseBigInt } from "../src/formatters"
+import { parseBigInt } from "../formatters"
 
 interface useApproveProps {
   assetSymbol: string

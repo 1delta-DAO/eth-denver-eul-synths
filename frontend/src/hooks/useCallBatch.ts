@@ -1,8 +1,8 @@
 import { useAccount, useClient, useWriteContract } from "wagmi"
-import { evcAbi } from "../src/abis/EVC"
+import { evcAbi } from "../abis/EVC"
 import { sepolia } from "viem/chains"
-import { BalancerAdapter__factory, EVC__factory, MintableVault__factory } from "../src/abis/types"
-import { COLLATERAL_VAULT, DEPLOYED_ADAPTER, DEPLOYED_EVC, MINTABLE_VAULT, PoolAsset, symbolToAsset } from "../src/constants"
+import { BalancerAdapter__factory, EVC__factory, MintableVault__factory } from "../abis/types"
+import { COLLATERAL_VAULT, DEPLOYED_ADAPTER, DEPLOYED_EVC, MINTABLE_VAULT, PoolAsset, symbolToAsset } from "../constants"
 import { parseUnits, zeroAddress } from 'viem'
 import { waitForTransactionReceipt } from "viem/actions"
 
@@ -24,7 +24,7 @@ const useCallBatch = () => {
 
   return async (depositAmount: number, borrowAmount: number, assetObj: PoolAsset) => {
     const symbol = assetObj.symbol
-    const asset = symbolToAsset(symbol)
+    const asset = symbolToAsset[symbol as keyof typeof symbolToAsset]
     if (!asset?.address) return;
 
     const callEvcEnableController = evcInterface.encodeFunctionData(

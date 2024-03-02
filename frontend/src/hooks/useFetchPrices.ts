@@ -1,10 +1,10 @@
 import { multicall } from '@wagmi/core'
-import { poolAssets } from '../src/constants'
+import { poolAssets } from '../constants'
 import { useEffect, useState } from 'react'
 import { useReadContract } from 'wagmi'
 import { optimism } from 'viem/chains'
-import { wagmiConfig } from '../_app'
-import { parseBigInt } from '../src/formatters'
+import { wagmiConfig } from '../../pages/_app'
+import { parseBigInt } from '../formatters'
 
 export const useFetchPrices = () => {
 
