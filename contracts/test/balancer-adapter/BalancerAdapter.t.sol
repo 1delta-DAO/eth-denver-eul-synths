@@ -14,9 +14,8 @@ import {IBalancerPool} from "../../src/balancer-adapter/interfaces/IBalancerPool
 import {StablePoolUserData} from "../../src/balancer-adapter/interfaces/StablePoolUserData.sol";
 import {BalancerAdapter, IMinimalVault} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {WrappedRateProvider} from "../../src/balancer-adapter/WrappedRateProvider.sol";
-import {MockVault} from "./MockVault.sol";
+import {MockVault} from "../mocks/MockVault.sol";
 
-// run via `forge test -vv --match-test "create"`
 contract BalancerAdapterTest is
     Test,
     BalancerSepoliaAddresses,

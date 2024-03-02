@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.19;
 
-import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
-import {IBalancerPool} from "../../src/balancer-adapter/interfaces/IBalancerPool.sol";
-import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
-import {WrappedRateProvider} from "../../src/balancer-adapter/WrappedRateProvider.sol";
+import {IERC20} from "../balancer-adapter/interfaces/IERC20.sol";
+import {IBalancerPool} from "../balancer-adapter/interfaces/IBalancerPool.sol";
+import {BalancerAdapter} from "../balancer-adapter/BalancerAdapter.sol";
+import {WrappedRateProvider} from "../balancer-adapter/WrappedRateProvider.sol";
 
 import "evc/EthereumVaultConnector.sol";
-import {VaultMintable} from "../../src/1delta/VaultMintable.sol";
-import {VaultCollateral} from "../../src/1delta/VaultCollateral.sol";
-import {ERC20Mintable} from "../../src/ERC20/ERC20Mintable.sol";
+import {VaultMintable} from "../vaults/VaultMintable.sol";
+import {VaultCollateral} from "../vaults/VaultCollateral.sol";
+import {ERC20Mintable} from "../ERC20/ERC20Mintable.sol";
 import {IRMMock} from "../../test/mocks/IRMMock.sol";
 import {BalancerSepoliaAddresses} from "../../test/balancer-adapter/BalancerSepoliaAddresses.sol";
 import {ChainLinkFeedAddresses} from "../../test/balancer-adapter/ChainLinkFeedAddresses.sol";

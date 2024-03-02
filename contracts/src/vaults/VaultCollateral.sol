@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.19;
 
-import {VaultSimple, ERC20, IEVC} from "../vaults/open-zeppelin/VaultSimple.sol";
+import {VaultSimple, ERC20, IEVC} from "../helpers/vaults/open-zeppelin/VaultSimple.sol";
 
 contract VaultCollateral is VaultSimple {
     constructor(

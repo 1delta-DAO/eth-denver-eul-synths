@@ -31,7 +31,6 @@ contract SynthDeployerTestSepolia is Test {
     function test_adapter_vault() public {
         address caller = 0x19b04cCcEA74AE40940aFd19d1E60DA940668cf7;
 
-
         VaultMintable mintableVault = synths.mintableVault();
         VaultCollateral collateralVault = synths.collateralVault();
 
@@ -43,6 +42,10 @@ contract SynthDeployerTestSepolia is Test {
         console.log("this", address(this));
         console.log("adapter", address(synths.balancerAdapter()));
         console.log("evc", address(synths.evc()));
+        
+        console.log("USDC", address(synths.USDC()));
+        console.log("DAI", address(synths.DAI()));
+        console.log("eulUSD", address(synths.eulUSD()));
 
         vm.assume(caller != address(0));
         vm.assume(

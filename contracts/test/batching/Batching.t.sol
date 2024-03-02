@@ -14,13 +14,12 @@ import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {WrappedRateProvider} from "../../src/balancer-adapter/WrappedRateProvider.sol";
 
 import "evc/EthereumVaultConnector.sol";
-import {VaultMintable} from "../../src/1delta/VaultMintable.sol";
-import {VaultCollateral} from "../../src/1delta/VaultCollateral.sol";
+import {VaultMintable} from "../../src/vaults/VaultMintable.sol";
+import {VaultCollateral} from "../../src/vaults/VaultCollateral.sol";
 import {ERC20Mintable} from "../../src/ERC20/ERC20Mintable.sol";
 import {IRMMock} from "../mocks/IRMMock.sol";
 
-// run via `forge test -vv --match-test "create"`
-contract BalancerAdapterVaultTest is
+contract BatchingTest is
     Test,
     BalancerSepoliaAddresses,
     ChainLinkFeedAddresses
@@ -60,7 +59,7 @@ contract BalancerAdapterVaultTest is
         eUSD.mint(address(this), 10_000_000e18);
 
         // EVC
-        evc = new EthereumVaultConnector(); 
+        evc = new EthereumVaultConnector();
 
         // balancer contracts
         balancerAdapter = new BalancerAdapter(
@@ -80,21 +79,36 @@ contract BalancerAdapterVaultTest is
 
         // vault contract
         IRMMock irm = new IRMMock();
-        mintableVault = new VaultMintable(evc, address(eUSD), irm, balancerAdapter, address(USDC), "eUSD Liability Vault", "EUSDLV");
-        collateralVault = new VaultCollateral(evc, address(poolToken), "Pool Token Collateral Vault", "PTCV");
+        mintableVault = new VaultMintable(
+            evc,
+            address(eUSD),
+            irm,
+            balancerAdapter,
+            address(USDC),
+            "eUSD Liability Vault",
+            "EUSDLV"
+        );
+        collateralVault = new VaultCollateral(
+            evc,
+            address(poolToken),
+            "Pool Token Collateral Vault",
+            "PTCV"
+        );
         irm.setInterestRate(10); // 10% APY
 
         // transfer ownership
         eUSD.transferOwnership(address(mintableVault));
     }
 
-    function test_adapter_vault(address alice) public {
+    function test_leverage_pool_position(address alice) public {
         address caller = alice;
 
         console.log("assume");
         vm.assume(caller != address(0));
         vm.assume(
-            caller != address(evc) && caller != address(mintableVault) && caller != address(collateralVault)
+            caller != address(evc) &&
+                caller != address(mintableVault) &&
+                caller != address(collateralVault)
         );
 
         USDC.transfer(caller, 200e6);
@@ -119,19 +133,31 @@ contract BalancerAdapterVaultTest is
             targetContract: address(evc),
             onBehalfOfAccount: address(0),
             value: 0,
-            data: abi.encodeWithSelector(IEVC.enableController.selector, caller, address(mintableVault))
+            data: abi.encodeWithSelector(
+                IEVC.enableController.selector,
+                caller,
+                address(mintableVault)
+            )
         });
         items[1] = IEVC.BatchItem({
             targetContract: address(evc),
             onBehalfOfAccount: address(0),
             value: 0,
-            data: abi.encodeWithSelector(IEVC.enableCollateral.selector, caller, address(collateralVault))
+            data: abi.encodeWithSelector(
+                IEVC.enableCollateral.selector,
+                caller,
+                address(collateralVault)
+            )
         });
         items[2] = IEVC.BatchItem({
             targetContract: address(mintableVault),
             onBehalfOfAccount: caller,
             value: 0,
-            data: abi.encodeWithSelector(VaultMintable.borrow.selector, borrowAmount, address(balancerAdapter))
+            data: abi.encodeWithSelector(
+                VaultMintable.borrow.selector,
+                borrowAmount,
+                address(balancerAdapter)
+            )
         });
         items[3] = IEVC.BatchItem({
             targetContract: address(balancerAdapter),
@@ -146,7 +172,7 @@ contract BalancerAdapterVaultTest is
             )
         });
 
-        console.log("approve collateral"); 
+        console.log("approve collateral");
         vm.prank(caller);
         USDC.approve(address(balancerAdapter), type(uint).max);
 
@@ -159,11 +185,22 @@ contract BalancerAdapterVaultTest is
         assertEq(mintableVault.maxWithdraw(caller), 0);
         assertEq(mintableVault.debtOf(caller), borrowAmount);
         assertEq(poolToken.balanceOf(caller), 0);
-        
+
         uint collateralBalance = poolToken.balanceOf(address(collateralVault));
-        uint256 poolTokenAmountInUSDC = balancerAdapter.getQuote(collateralBalance, address(0), address(USDC));
-        uint256 usdAmountDepositAndBorrow = (borrowAmount + depositAmount * 10 ** (eUSD.decimals() - IERC20(depositAsset).decimals())) /  10 ** (eUSD.decimals() - USDC.decimals());
-        assertApproxEqRel(poolTokenAmountInUSDC, usdAmountDepositAndBorrow, 0.01e18);
+        uint256 poolTokenAmountInUSDC = balancerAdapter.getQuote(
+            collateralBalance,
+            address(0),
+            address(USDC)
+        );
+        uint256 usdAmountDepositAndBorrow = (borrowAmount +
+            depositAmount *
+            10 ** (eUSD.decimals() - IERC20(depositAsset).decimals())) /
+            10 ** (eUSD.decimals() - USDC.decimals());
+        assertApproxEqRel(
+            poolTokenAmountInUSDC,
+            usdAmountDepositAndBorrow,
+            0.01e18
+        );
     }
 
     function joinPool() internal {

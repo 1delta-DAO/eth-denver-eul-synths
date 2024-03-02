@@ -30,3 +30,16 @@ Balancer for instance allowed us to select from a multitude of Stable Pools, eac
 - Synthetic assets enabled by ChainLink's price feeds
 - Balancer's Composable Stable Pools (which are also oracle-based)
 - Euler's Ethereum Vault Connector that allows for flexible batching and single-click leveraged Balancer DEX liquidity provision
+
+## Contracts
+
+| Contract    | Address |
+| -------- | ------- |
+| BalancerAdapterSepolia  | `0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98`    |
+| 3USD plus eulUSD CSP| `0x5a9676311a41e8acae9e2f46c1b5c4a304c38736`|
+| VaultCollateral | `0xCe434378adacC51d54312c872113D687Ac19B516`     |
+| VaultMinting    | `0x782FCEf760286f91e8466740a77C0e00a487Ad38`    |
+| EVC   | `0xA347d56A33Ea46E8dCAF2Ce2De57087f8f171Bd6`    |
+| DAI    | `0xbBF92F1A64Ad4f0292e05fd8E690fA8B872f835b`    |
+| USDC    | `0xB67881Af90F005BE8c7553793F89BDbb3FD7448f`    |
+| eulUSD    | `0x9f5E877f7a03f50C0319a6E15289283d6a8AC2E3`    |
