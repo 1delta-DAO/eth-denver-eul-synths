@@ -57,7 +57,7 @@ contract BalancerAdapterVaultTest is
         DAI = new Fiat("DAI", "DAI Stablecoin", 18);
         console.log("DAI", address(DAI));
 
-        eUSD.mint(address(this), 1_000_000e18);
+        eUSD.mint(address(this), 10_000_000e18);
 
         // EVC
         evc = new EthereumVaultConnector(); 
@@ -102,9 +102,9 @@ contract BalancerAdapterVaultTest is
 
         console.log("setCollateralFactor");
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
-        mintableVault.setCollateralFactor(address(collateralVault), 80); // cf = 0.8
+        mintableVault.setCollateralFactor(address(collateralVault), 90); // cf = 0.9
 
-        uint256 borrowAmount = 20e18; // eUSD
+        uint256 borrowAmount = 400e18; // eUSD
 
         address depositAsset = address(USDC);
         uint256 depositAmount = 50e6;
@@ -170,17 +170,17 @@ contract BalancerAdapterVaultTest is
         uint[] memory amounts = new uint256[](3);
         address adapter = address(balancerAdapter);
 
-        uint eusdAmount = 1_200.0e18;
+        uint eusdAmount = 1_200_000.0e18;
         APPROX_PRICE_TRACKER += eusdAmount;
         amounts[0] = eusdAmount;
         eUSD.transfer(adapter, eusdAmount);
 
-        uint usdcAmount = 1_020.0e6;
+        uint usdcAmount = 1_020_000.0e6;
         APPROX_PRICE_TRACKER += usdcAmount * 1e12;
         amounts[1] = usdcAmount;
         USDC.transfer(adapter, usdcAmount);
 
-        uint daiAmount = 900.0e18;
+        uint daiAmount = 900_000.0e18;
         APPROX_PRICE_TRACKER += daiAmount;
         amounts[2] = daiAmount;
         DAI.transfer(adapter, daiAmount);
