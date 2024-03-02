@@ -13,7 +13,7 @@ import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { ChakraProvider } from '@chakra-ui/react'
 
 export const wagmiConfig = getDefaultConfig({
-  appName: 'eulSynth',
+  appName: 'eulSynths',
   projectId: 'YOUR_PROJECT_ID',
   chains: [
     mainnet,
