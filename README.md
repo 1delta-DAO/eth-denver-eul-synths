@@ -31,19 +31,31 @@ Balancer for instance allowed us to select from a multitude of Stable Pools, eac
 - Balancer's Composable Stable Pools (which are also oracle-based)
 - Euler's Ethereum Vault Connector that allows for flexible batching and single-click leveraged Balancer DEX liquidity provision
 
-## Contracts (ETH-Sepolia)
+## Contracts
+The contracts are deployed on Ethereum Sepolia testnet.
 
-| Contract    | Address |
+| Contract    | Address | Description |
+| -------- | ------- | ------- |
+| BalancerAdapterSepolia  | `0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98` | Deploys balancer stable pool and is used for interactions with balancer, such as adding liquidity. |
+| 3USD plus eulUSD CSP| `0x5a9676311a41e8acae9e2f46c1b5c4a304c38736`| Balancer pool token, used as underlying asset in the VaultCollateral. |
+| VaultCollateral | `0xCe434378adacC51d54312c872113D687Ac19B516`     | Simple collateral vault which uses the balancer pool token as underlying asset. |
+| VaultMintable    | `0x782FCEf760286f91e8466740a77C0e00a487Ad38`    | Replaces existing borrow and repay logic with mint and burn to enable issurance of synthetic assets. |
+| EVC   | `0xA347d56A33Ea46E8dCAF2Ce2De57087f8f171Bd6`    |  Euler's Ethereum Vault Connector facilitates communication between ERC-4626 vaults. |
+| DAI    | `0xbBF92F1A64Ad4f0292e05fd8E690fA8B872f835b`    | ERC20 Token |
+| USDC    | `0xB67881Af90F005BE8c7553793F89BDbb3FD7448f`    | ERC20 Token |
+| eulUSD    | `0x9f5E877f7a03f50C0319a6E15289283d6a8AC2E3`    | Synthetic ERC20 Token which is minted by the VaultMintable contract on borrow. |
+
+## Smart Contract Testing
+The contract tests were implemented with forge. To run the tests, move into the contracts folder with `cd contracts`. Run all tests with `forge test -vv`. To run a specific test, use the command `forge test -vv --match-contract <contract_name>`.
+
+| Test File    | Description |
 | -------- | ------- |
-| BalancerAdapterSepolia  | `0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98`    |
-| 3USD plus eulUSD CSP| `0x5a9676311a41e8acae9e2f46c1b5c4a304c38736`|
-| VaultCollateral | `0xCe434378adacC51d54312c872113D687Ac19B516`     |
-| VaultMinting    | `0x782FCEf760286f91e8466740a77C0e00a487Ad38`    |
-|EulSynths deployer|`0x7D5a7B529838859e90d027C0F83Ed0789c1e0DDf`|
-| EVC   | `0xA347d56A33Ea46E8dCAF2Ce2De57087f8f171Bd6`    |
-| DAI    | `0xbBF92F1A64Ad4f0292e05fd8E690fA8B872f835b`    |
-| USDC    | `0xB67881Af90F005BE8c7553793F89BDbb3FD7448f`    |
-| eulUSD    | `0x9f5E877f7a03f50C0319a6E15289283d6a8AC2E3`    |
+| BalancerAdapter.t.sol | Tests quoting and pricing.  |
+| BalancerCreate.t.sol | Tests stable pool creation. |
+| Batching.t.sol | Tests batching of deposit (with BalancerAdapter) and borrow to leverage LP. |
+| SynthDeployer.t.sol   | Deploys contracts and leverages LP position. |
+| SynthDeployerSepolia.t.sol   |  Deploys contracts with configuration for Ethereum Sepolia testnet and leverages LP position. |
+| VaultMintable.t.sol | Tests borrow (mint) and repay (burn) functions of the vault. |
 
 
 ## How does it fit into DeFI
