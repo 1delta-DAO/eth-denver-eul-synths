@@ -9,6 +9,13 @@ Live deployment: https://eth-denver-eul-synths.vercel.app/
 First, run the development server:
 
 ```bash
+// install dependencies
+npm install
+
+// create types
+npm run typechain
+
+// run local server
 npm run dev
 ```
 
