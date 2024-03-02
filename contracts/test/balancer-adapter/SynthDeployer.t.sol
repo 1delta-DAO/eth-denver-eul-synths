@@ -6,26 +6,30 @@ import "forge-std/console.sol";
 import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
 import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {EulSynths, VaultMintable, VaultCollateral, IEVC, ERC20Mintable} from "../../src/deployer/Deployer.sol";
+import {BalancerAdapterSepolia} from "../../src/balancer-adapter/BalancerAdapterSepolia.sol";
+import "evc/EthereumVaultConnector.sol";
 
 // forge test -vv --match-contract "SynthDeployerTest"
 contract SynthDeployerTest is Test {
     EulSynths synths;
+    EthereumVaultConnector evc;
+    BalancerAdapterSepolia balancerAdapterSepolia;
 
     function setUp() public {
         vm.createSelectFork({
             blockNumber: 5_388_756,
             urlOrAlias: "https://eth-sepolia.public.blastapi.io"
         });
-
-        synths = new EulSynths();
+        evc = new EthereumVaultConnector();
+        balancerAdapterSepolia = new BalancerAdapterSepolia(address(evc));
+        synths = new EulSynths(address(balancerAdapterSepolia), address(evc));
     }
 
-    function test_adapter_vault() public {
-        address caller = 0x19b04cCcEA74AE40940aFd19d1E60DA940668cf7;
+    function test_adapter_vault(address alice) public {
+        address caller = alice;
 
         VaultMintable mintableVault = synths.mintableVault();
         VaultCollateral collateralVault = synths.collateralVault();
-        IEVC evc = synths.evc();
 
         console.log("assume");
 

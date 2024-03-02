@@ -30,7 +30,7 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
 
     mapping(address => address) internal assetToOracle;
 
-    constructor() {
+    constructor(address _balancerAdapter, address _evc) {
         // stablecoins creation, they already mint to the caller
         USDC = new ERC20Mintable("USDC", "USD Coin", 6);
         eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
@@ -46,14 +46,10 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         DAI.transfer(msg.sender, 100_000.0e18);
 
         // EVC
-        evc = new EthereumVaultConnector();
+        evc = EthereumVaultConnector(payable(_evc));
 
         // balancer contracts
-        balancerAdapter = new BalancerAdapter(
-            CSP_FACTORY,
-            BALANCER_VAULT,
-            address(evc)
-        );
+        balancerAdapter = BalancerAdapter(_balancerAdapter);
 
         // add oracles
         assetToOracle[address(USDC)] = address(
