@@ -3,15 +3,15 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-//import {ERC20} from "solmate/tokens/ERC20.sol";
 import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 import "evc/EthereumVaultConnector.sol";
 import {EVCUtil} from "evc/utils/EVCUtil.sol";
 import {IRMMock} from "../../mocks/IRMMock.sol";
 import {PriceOracleMock} from "../../mocks/PriceOracleMock.sol";
 import {VaultMintable} from "../../../src/1delta/VaultMintable.sol";
-import {VaultSimple} from "../../../src/vaults/solmate/VaultSimple.sol";
-import {VaultRegularBorrowable, ERC20} from "../../../src/vaults/open-zeppelin/VaultRegularBorrowable.sol";
+import {VaultCollateral} from "../../../src/1delta/VaultCollateral.sol";
+import {VaultRegularBorrowable} from "../../../src/vaults/open-zeppelin/VaultRegularBorrowable.sol";
+import {VaultSimple} from "../../../src/vaults/open-zeppelin/VaultSimple.sol";
 import {ERC20Mintable} from "../../../src/ERC20/ERC20Mintable.sol";
 
 contract VaultMintableTest is Test {
@@ -22,7 +22,7 @@ contract VaultMintableTest is Test {
     IRMMock irm;
     PriceOracleMock oracle;
 
-    VaultSimple collateralVault;
+    VaultCollateral collateralVault;
     VaultMintable mintableVault;
 
     function setUp() public {
@@ -33,9 +33,9 @@ contract VaultMintableTest is Test {
         irm = new IRMMock();
         oracle = new PriceOracleMock();
         
-        mintableVault = new VaultMintable(evc, liabilityAsset, irm, oracle, ERC20(address(referenceAsset)), "Pool Token Liability Vault", "PTLV");
+        mintableVault = new VaultMintable(evc, address(liabilityAsset), irm, oracle, address(referenceAsset), "Pool Token Liability Vault", "PTLV");
 
-        collateralVault = new VaultSimple(evc, collateralAsset, "Pool Token Collateral Vault", "PTCV");
+        collateralVault = new VaultCollateral(evc, address(collateralAsset), "Pool Token Collateral Vault", "PTCV");
 
         irm.setInterestRate(10); // 10% APY
 
@@ -451,8 +451,8 @@ contract VaultMintableTest is Test {
 
         mintAndApprove(alice, bob);
 
-        mintableVault.setCollateralFactor(address(mintableVault), 100); // cf = 1, self-collateralization
-        mintableVault.setCollateralFactor(address(collateralVault), 100); // cf = 1
+        mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 1, self-collateralization
+        mintableVault.setCollateralFactor(address(collateralVault), 80); // cf = 1
 
         uint256 borrowAmount = 100e6;
         uint256 depositAmount = 50e18;

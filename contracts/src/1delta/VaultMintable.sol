@@ -17,13 +17,13 @@ contract VaultMintable is VaultRegularBorrowable {
 
     constructor(
         IEVC _evc,
-        ERC20Mintable _asset,
+        address  _asset,
         IIRM _irm,
         IPriceOracle _oracle,
-        ERC20 _referenceAsset,
+        address _referenceAsset,
         string memory _name,
         string memory _symbol
-    ) VaultRegularBorrowable(_evc, _asset, _irm, _oracle, _referenceAsset, _name, _symbol) {}
+    ) VaultRegularBorrowable(_evc, ERC20Mintable(_asset), _irm, _oracle, ERC20(_referenceAsset), _name, _symbol) {}
 
     /// @notice Borrows assets.
     /// @param assets The amount of assets to borrow.
