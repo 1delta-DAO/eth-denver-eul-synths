@@ -11,7 +11,7 @@ The protocol allows users to leverage DEX liquidity from protocols like Balancer
 - The architecture allows for native minting of synthetic assets together with direct liquidity bootstrapping via Balancer's Composable Stable Pools.
 - All of this is enabled by Euler's Ethereum Vault Connector - the batch and deferred health check allow for single-click execution of leveraged AMM pools without looping.
 
-![Single click Leverage AMM Pools](./assets/eulSynth.png)
+![Single click Leverage AMM Pools](./assets/eulSynths.png)
 
 ## What problems do we solve
 
