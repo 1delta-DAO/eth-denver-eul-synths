@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "typechain": "typechain --target ethers-v6 --out-dir pages/src/abis/types \"./pages/src/abis/json/**/*.json\"",
+    "typechain": "typechain --target ethers-v6 --out-dir src/abis/types \"./src/abis/json/**/*.json\"",
     "build": "npm run typechain && next build",
     "start": "next start",
     "lint": "next lint"
