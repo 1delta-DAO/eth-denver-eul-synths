@@ -36,7 +36,7 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
 
-        eulUSD.mint(address(this), 1_000_000.0e18);
+        eulUSD.mint(address(this), 1_000_500.0e18);
         USDC.mint(address(this), 2_000_000.0e6);
         DAI.mint(address(this), 2_000_000.0e18);
 
@@ -49,7 +49,6 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             BALANCER_VAULT,
             address(evc)
         );
-
 
         // add oracles
         assetToOracle[address(USDC)] = address(
@@ -107,7 +106,7 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             .getDecimalScalesAndTokens();
 
         for (uint i = 0; i < assets.length; i++) {
-            uint amountRaw = (1000.0 + i * 10);
+            uint amountRaw = (1_000_000.0 + i * 10);
             uint amount = amountRaw * scales[i];
             amounts[i] = amount;
             IERC20(assets[i]).transfer(adapter, amount);
