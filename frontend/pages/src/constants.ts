@@ -76,7 +76,7 @@ export const synthAssets: PoolAsset[] = [
   {
     symbol: 'eulLTC',
     name: 'Euler Litecoin',
-    icon: 'https://assets.coingecko.com/coins/images/2/standard/litecoin.png',
+    icon: "./img/eulLTC.png",
     decimals: 18,
     priceFeedAddress: "0x6AF09DF7563C363B5763b9102712EbeD3b9e859B"
   }
@@ -88,12 +88,24 @@ export const symbolToAsset = (symbol: string): PoolAsset | undefined => {
   return poolAssets.find((asset) => asset.symbol === symbol)
 }
 
+export const dexs = [
+  {
+    name: "Curve",
+    icon: "https://assets.coingecko.com/coins/images/12124/standard/Curve.png"
+  },
+  {
+    name: "Balancer",
+    icon: "https://assets.coingecko.com/coins/images/11683/standard/Balancer.png?1696511572"
+  }
+]
+
 export interface Pool {
   assets: PoolAsset[]
   apr: number
   stakingApr?: number // if staking is available
   tvl: number
   totalSupply?: number // for e-assets
+  dex: string
 }
 
 export const pools: Pool[] = [
@@ -105,6 +117,7 @@ export const pools: Pool[] = [
     apr: 0.13451,
     stakingApr: 0.2412,
     tvl: 1000000,
+    dex: "Curve"
   },
   {
     assets: [
@@ -115,6 +128,7 @@ export const pools: Pool[] = [
     apr: 0.1789,
     tvl: 2000000,
     totalSupply: 100000,
+    dex: "Balancer"
   },
   {
     assets: [
@@ -124,6 +138,7 @@ export const pools: Pool[] = [
     apr: 0.323,
     tvl: 3000000,
     totalSupply: 2000,
+    dex: "Balancer"
   },
   {
     assets: [
@@ -133,6 +148,7 @@ export const pools: Pool[] = [
     ],
     apr: 0.4,
     tvl: 4000000,
+    dex: "Curve"
   }
 ]
 
