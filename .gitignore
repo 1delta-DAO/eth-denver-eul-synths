@@ -6,3 +6,6 @@ contracts/out/*
 
 # foundry imports
 # contracts/lib/*
+
+# cache
+contracts/cache/*
