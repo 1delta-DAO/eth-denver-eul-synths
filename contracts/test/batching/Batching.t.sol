@@ -118,7 +118,7 @@ contract BatchingTest is
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
         mintableVault.setCollateralFactor(address(collateralVault), 90); // cf = 0.9
 
-        uint256 borrowAmount = 400e18; // eUSD
+        uint256 borrowAmount = 300e18; // eUSD
 
         address depositAsset = address(USDC);
         uint256 depositAmount = 50e6;
