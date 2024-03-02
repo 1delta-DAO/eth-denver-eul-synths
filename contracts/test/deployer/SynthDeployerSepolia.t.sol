@@ -31,7 +31,6 @@ contract SynthDeployerTestSepolia is Test {
     function test_adapter_vault() public {
         address caller = 0x19b04cCcEA74AE40940aFd19d1E60DA940668cf7;
 
-
         VaultMintable mintableVault = synths.mintableVault();
         VaultCollateral collateralVault = synths.collateralVault();
 
