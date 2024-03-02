@@ -10,6 +10,8 @@ The protocol allows users to leverage DEX liquidity from protocols like Balancer
 - The architecture allows for native miniting of synthetic assets together with direct liquidity bootstrapping via Balacner Composed Stable Pools
 
 
+![Single click Leverage AMM Pools](./assets/eulSynth.png)
+
 ## What problems do we solve
 
 Getting optimal yield has been very duifficult in the past. A multitude of synthetic assets and derivatives (especially LSDs) allow for multiple variations of generating income.
