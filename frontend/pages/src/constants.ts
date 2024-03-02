@@ -29,14 +29,16 @@ export const payAssets: PoolAsset[] = [
     name: "Dai",
     icon: "https://assets.coingecko.com/coins/images/9956/standard/Badge_Dai.png?1696509996",
     decimals: 18,
-    priceFeedAddress: "0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9"
+    priceFeedAddress: "0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9",
+    address: "0xbBF92F1A64Ad4f0292e05fd8E690fA8B872f835b"
   },
   {
     symbol: "USDC",
     name: "USD Coin",
     icon: "https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png",
     decimals: 6,
-    priceFeedAddress: "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"
+    priceFeedAddress: "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+    address: "0xB67881Af90F005BE8c7553793F89BDbb3FD7448f"
   },
   {
     symbol: "USDT",
@@ -59,9 +61,10 @@ export const synthAssets: PoolAsset[] = [
   {
     symbol: "eulUSD",
     name: "Euler Dollar",
-    icon: "https://assets.coingecko.com/coins/images/28445/standard/0xa0d69e286b938e21cbf7e51d71f6a4c8918f482f.png",
+    icon: "./img/eulUSD.svg",
     decimals: 18,
-    defaultPrice: 1.01
+    defaultPrice: 1.01,
+    address: "0x9f5e877f7a03f50c0319a6e15289283d6a8ac2e3"
   },
   {
     symbol: 'eulLTC',

@@ -1,0 +1,308 @@
+export const balancerAdapterAbi = [
+  {
+      "type": "constructor",
+      "inputs": [
+          {
+              "name": "evc",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "stateMutability": "nonpayable"
+  },
+  {
+      "type": "function",
+      "name": "balancerVault",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "createPool",
+      "inputs": [
+          {
+              "name": "tokens",
+              "type": "address[]",
+              "internalType": "address[]"
+          },
+          {
+              "name": "rateProviders",
+              "type": "address[]",
+              "internalType": "address[]"
+          }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+  },
+  {
+      "type": "function",
+      "name": "cspFactory",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "depositTo",
+      "inputs": [
+          {
+              "name": "amounts",
+              "type": "uint256[]",
+              "internalType": "uint256[]"
+          },
+          {
+              "name": "recipient",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+  },
+  {
+      "type": "function",
+      "name": "facilitateLeveragedDeposit",
+      "inputs": [
+          {
+              "name": "depositAsset",
+              "type": "address",
+              "internalType": "address"
+          },
+          {
+              "name": "depositAmount",
+              "type": "uint256",
+              "internalType": "uint256"
+          },
+          {
+              "name": "vault",
+              "type": "address",
+              "internalType": "address"
+          },
+          {
+              "name": "recipient",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "outputs": [
+          {
+              "name": "bptAmountOrShares",
+              "type": "uint256",
+              "internalType": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable"
+  },
+  {
+      "type": "function",
+      "name": "getDecimalScalesAndTokens",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "_tokens",
+              "type": "address[]",
+              "internalType": "address[]"
+          },
+          {
+              "name": "_scales",
+              "type": "uint256[]",
+              "internalType": "uint256[]"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "getOriginalDecimalScalesAndTokens",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "_tokens",
+              "type": "address[]",
+              "internalType": "address[]"
+          },
+          {
+              "name": "_scales",
+              "type": "uint256[]",
+              "internalType": "uint256[]"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "getPrice",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "uint256",
+              "internalType": "uint256"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "getQuote",
+      "inputs": [
+          {
+              "name": "amount",
+              "type": "uint256",
+              "internalType": "uint256"
+          },
+          {
+              "name": "",
+              "type": "address",
+              "internalType": "address"
+          },
+          {
+              "name": "quote",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "outputs": [
+          {
+              "name": "out",
+              "type": "uint256",
+              "internalType": "uint256"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "getQuotes",
+      "inputs": [
+          {
+              "name": "amount",
+              "type": "uint256",
+              "internalType": "uint256"
+          },
+          {
+              "name": "",
+              "type": "address",
+              "internalType": "address"
+          },
+          {
+              "name": "quote",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "outputs": [
+          {
+              "name": "bidOut",
+              "type": "uint256",
+              "internalType": "uint256"
+          },
+          {
+              "name": "askOut",
+              "type": "uint256",
+              "internalType": "uint256"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "initializePool",
+      "inputs": [
+          {
+              "name": "amounts",
+              "type": "uint256[]",
+              "internalType": "uint256[]"
+          },
+          {
+              "name": "recipient",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+  },
+  {
+      "type": "function",
+      "name": "name",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "string",
+              "internalType": "string"
+          }
+      ],
+      "stateMutability": "pure"
+  },
+  {
+      "type": "function",
+      "name": "pool",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "address",
+              "internalType": "address"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "function",
+      "name": "poolId",
+      "inputs": [],
+      "outputs": [
+          {
+              "name": "",
+              "type": "bytes32",
+              "internalType": "bytes32"
+          }
+      ],
+      "stateMutability": "view"
+  },
+  {
+      "type": "error",
+      "name": "ControllerDisabled",
+      "inputs": []
+  },
+  {
+      "type": "error",
+      "name": "NotAuthorized",
+      "inputs": []
+  },
+  {
+      "type": "error",
+      "name": "PO_BaseUnsupported",
+      "inputs": []
+  },
+  {
+      "type": "error",
+      "name": "PO_NoPath",
+      "inputs": []
+  },
+  {
+      "type": "error",
+      "name": "PO_Overflow",
+      "inputs": []
+  },
+  {
+      "type": "error",
+      "name": "PO_QuoteUnsupported",
+      "inputs": []
+  }
+]

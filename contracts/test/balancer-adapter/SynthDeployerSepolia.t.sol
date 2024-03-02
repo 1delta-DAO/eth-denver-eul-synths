@@ -9,20 +9,23 @@ import {EulSynths, VaultMintable, VaultCollateral, IEVC, ERC20Mintable} from "..
 import {BalancerAdapterSepolia} from "../../src/balancer-adapter/BalancerAdapterSepolia.sol";
 import "evc/EthereumVaultConnector.sol";
 
-// forge test -vv --match-contract "SynthDeployerTest"
-contract SynthDeployerTest is Test {
+// forge test -vv --match-contract "SynthDeployerTestSepolia"
+contract SynthDeployerTestSepolia is Test {
     EulSynths synths;
     EthereumVaultConnector evc;
     BalancerAdapterSepolia balancerAdapterSepolia;
+    address DEPLOYED_EVC = 0xA347d56A33Ea46E8dCAF2Ce2De57087f8f171Bd6;
+    address DEPLOYED_SYNTHS = 0x7D5a7B529838859e90d027C0F83Ed0789c1e0DDf;
+    address DEPLOYED_ADAPTER = 0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98;
 
     function setUp() public {
         vm.createSelectFork({
-            blockNumber: 5_388_756,
-            urlOrAlias: "https://eth-sepolia.public.blastapi.io"
+            blockNumber: 5_399_203,
+            urlOrAlias: "https://rpc.notadegen.com/eth/sepolia"
         });
-        evc = new EthereumVaultConnector();
-        balancerAdapterSepolia = new BalancerAdapterSepolia(address(evc));
-        synths = new EulSynths(address(balancerAdapterSepolia), address(evc));
+        evc = EthereumVaultConnector(payable(DEPLOYED_EVC));
+        balancerAdapterSepolia = BalancerAdapterSepolia(DEPLOYED_ADAPTER);
+        synths = EulSynths(0x7D5a7B529838859e90d027C0F83Ed0789c1e0DDf);
     }
 
     function test_adapter_vault(address alice) public {
@@ -43,17 +46,17 @@ contract SynthDeployerTest is Test {
                 caller != address(mintableVault) &&
                 caller != address(collateralVault)
         );
-        ERC20Mintable USDC = synths.USDC();
+        ERC20Mintable DAI = synths.DAI();
 
         // faucet and transfer
-        synths.faucet(address(USDC));
-        USDC.transfer(caller, 200e6);
-        assertEq(USDC.balanceOf(caller), 200e6);
+        synths.faucet(address(DAI));
+        DAI.transfer(caller, 200e18);
+        assertEq(DAI.balanceOf(caller), 200e18);
 
         uint256 borrowAmount = 20e18; // eUSD
 
-        address depositAsset = address(USDC);
-        uint256 depositAmount = 50e6;
+        address depositAsset = address(DAI);
+        uint256 depositAmount = 50e18;
 
         address vault = address(collateralVault);
         address recipient = caller;
@@ -108,7 +111,7 @@ contract SynthDeployerTest is Test {
 
         console.log("approve collateral");
         vm.prank(caller);
-        USDC.approve(balancerAdapter, type(uint).max);
+        DAI.approve(balancerAdapter, type(uint).max);
 
         console.log("batch");
         vm.prank(caller);
@@ -127,12 +130,12 @@ contract SynthDeployerTest is Test {
         uint256 poolTokenAmountInUSDC = synths.balancerAdapter().getQuote(
             collateralBalance,
             address(0),
-            address(USDC)
+            address(DAI)
         );
         uint256 usdAmountDepositAndBorrow = (borrowAmount +
             depositAmount *
             10 ** (eulUSD.decimals() - IERC20(depositAsset).decimals())) /
-            10 ** (eulUSD.decimals() - USDC.decimals());
+            10 ** (eulUSD.decimals() - DAI.decimals());
         assertApproxEqRel(
             poolTokenAmountInUSDC,
             usdAmountDepositAndBorrow,

@@ -2,10 +2,6 @@
 
 pragma solidity ^0.8.19;
 
-import {Test} from "forge-std/Test.sol";
-import "forge-std/console.sol";
-import {ICSPFactory} from "../balancer-adapter/interfaces/ICSPFactory.sol";
-import {IBalancerVaultGeneral} from "../balancer-adapter/interfaces/IVaultGeneral.sol";
 import {IERC20} from "../balancer-adapter/interfaces/IERC20.sol";
 import {IBalancerPool} from "../balancer-adapter/interfaces/IBalancerPool.sol";
 import {BalancerAdapter} from "../balancer-adapter/BalancerAdapter.sol";
@@ -34,28 +30,26 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
 
     mapping(address => address) internal assetToOracle;
 
-    constructor() {
+    constructor(address _balancerAdapter, address _evc) {
         // stablecoins creation, they already mint to the caller
         USDC = new ERC20Mintable("USDC", "USD Coin", 6);
-        console.log("USDC", address(USDC));
         eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
-        console.log("eulUSD", address(eulUSD));
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
-        console.log("DAI", address(DAI));
 
-        eulUSD.mint(address(this), 1_000_000.0e18);
+        // mint
+        eulUSD.mint(address(this), 1_000_500.0e18);
         USDC.mint(address(this), 2_000_000.0e6);
         DAI.mint(address(this), 2_000_000.0e18);
 
+        // transfer to sender
+        DAI.transfer(msg.sender, 100_000.0e6);
+        DAI.transfer(msg.sender, 100_000.0e18);
+
         // EVC
-        evc = new EthereumVaultConnector();
+        evc = EthereumVaultConnector(payable(_evc));
 
         // balancer contracts
-        balancerAdapter = new BalancerAdapter(
-            CSP_FACTORY,
-            BALANCER_VAULT,
-            address(evc)
-        );
+        balancerAdapter = BalancerAdapter(_balancerAdapter);
 
         // add oracles
         assetToOracle[address(USDC)] = address(
@@ -91,7 +85,6 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         // transfer ownership
         eulUSD.transferOwnership(address(mintableVault));
 
-        console.log("setCollateralFactor");
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
         mintableVault.setCollateralFactor(address(collateralVault), 90); // cf = 0.9
     }
@@ -114,7 +107,7 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             .getDecimalScalesAndTokens();
 
         for (uint i = 0; i < assets.length; i++) {
-            uint amountRaw = (1000.0 + i * 10);
+            uint amountRaw = (1_000_000.0 + i * 10);
             uint amount = amountRaw * scales[i];
             amounts[i] = amount;
             IERC20(assets[i]).transfer(adapter, amount);
