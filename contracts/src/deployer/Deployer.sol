@@ -19,33 +19,33 @@ import {IRMMock} from "../../test/mocks/IRMMock.sol";
 import {BalancerSepoliaAddresses} from "../../test/balancer-adapter/BalancerSepoliaAddresses.sol";
 import {ChainLinkFeedAddresses} from "../../test/balancer-adapter/ChainLinkFeedAddresses.sol";
 
-// run via `forge test -vv
+contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
+    ERC20Mintable public USDC;
+    ERC20Mintable public eulUSD;
+    ERC20Mintable public DAI;
+    IBalancerPool public poolToken;
 
-contract DeployEulSuynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
-    ERC20Mintable USDC;
-    ERC20Mintable eUSD;
-    ERC20Mintable DAI;
-    IBalancerPool poolToken;
+    BalancerAdapter public balancerAdapter;
 
-    BalancerAdapter balancerAdapter;
+    IEVC public evc;
 
-    IEVC evc;
+    VaultCollateral public collateralVault;
+    VaultMintable public mintableVault;
 
-    VaultCollateral collateralVault;
-    VaultMintable mintableVault;
-
-    uint256 constant MAX_VAL = type(uint).max;
+    mapping(address => address) internal assetToOracle;
 
     constructor() {
         // stablecoins creation, they already mint to the caller
         USDC = new ERC20Mintable("USDC", "USD Coin", 6);
         console.log("USDC", address(USDC));
-        eUSD = new ERC20Mintable("eUSD", "Euler Vault Dollars", 18);
-        console.log("eUSD", address(eUSD));
+        eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
+        console.log("eulUSD", address(eulUSD));
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
         console.log("DAI", address(DAI));
 
-        eUSD.mint(address(this), 1_000_000e18);
+        eulUSD.mint(address(this), 2_000.0e18);
+        USDC.mint(address(this), 2_000_000.0e6);
+        DAI.mint(address(this), 2_000_000.0e18);
 
         // EVC
         evc = new EthereumVaultConnector();
@@ -57,20 +57,15 @@ contract DeployEulSuynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             address(evc)
         );
 
-        console.log("create");
         create();
-
-        console.log("init");
         init();
-
-        console.log("joinPool");
         joinPool();
 
         // vault contract
         IRMMock irm = new IRMMock();
         mintableVault = new VaultMintable(
             evc,
-            address(eUSD),
+            address(eulUSD),
             irm,
             balancerAdapter,
             address(USDC),
@@ -86,7 +81,24 @@ contract DeployEulSuynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         irm.setInterestRate(10); // 10% APY
 
         // transfer ownership
-        eUSD.transferOwnership(address(mintableVault));
+        eulUSD.transferOwnership(address(mintableVault));
+
+        // add oracles
+        assetToOracle[address(USDC)] = address(
+            new WrappedRateProvider(USDC_FEED)
+        );
+        assetToOracle[address(DAI)] = address(
+            new WrappedRateProvider(DAI_FEED)
+        );
+    }
+
+    function faucet(address asset) external {
+        if (asset == address(USDC)) {
+            USDC.mint(msg.sender, 10_000.0e6);
+        }
+        if (asset == address(DAI)) {
+            DAI.mint(msg.sender, 10_000.0e18);
+        } else revert("Invalid asset");
     }
 
     function joinPool() internal {
@@ -97,23 +109,11 @@ contract DeployEulSuynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             .getDecimalScalesAndTokens();
 
         for (uint i = 0; i < assets.length; i++) {
-            uint amount = (1000.0 + i * 10) * scales[i];
+            uint amountRaw = (1000.0 + i * 10);
+            uint amount = amountRaw * scales[i];
             amounts[i] = amount;
             IERC20(assets[i]).transfer(adapter, amount);
         }
-
-        // uint eusdAmount = 1_200.0e18;
-        // amounts[0] = eusdAmount;
-        // eUSD.transfer(adapter, eusdAmount);
-
-        // uint usdcAmount = 1_020.0e6;
-        // amounts[1] = usdcAmount;
-        // USDC.transfer(adapter, usdcAmount);
-
-        // uint daiAmount = 900.0e18;
-        // amounts[2] = daiAmount;
-        // DAI.transfer(adapter, daiAmount);
-        console.log("join");
         // deposit balances to pool
         balancerAdapter.depositTo(amounts, address(this));
     }
@@ -124,33 +124,58 @@ contract DeployEulSuynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         address adapter = address(balancerAdapter);
 
         (address[] memory assets, uint[] memory scales) = balancerAdapter
-            .getDecimalScalesAndTokens();
-
+            .getOriginalDecimalScalesAndTokens();
+        address balancerPool = balancerAdapter.pool();
         for (uint i = 0; i < assets.length; i++) {
-            uint amount = (1000.0 + i * 10) * scales[i];
-            amounts[i] = amount;
-            IERC20(assets[i]).transfer(adapter, amount);
+            address token = assets[i];
+            if (token != balancerPool) {
+                uint amountRaw = (10.0 + i * 10) * 1e18;
+                uint amount = amountRaw / scales[i];
+                amounts[i] = amount;
+                IERC20(assets[i]).transfer(adapter, amount);
+            }
         }
 
-        console.log("inititalize");
         address recipient = address(this);
         balancerAdapter.initializePool(amounts, recipient);
 
         poolToken = IBalancerPool(balancerAdapter.pool());
-        console.log("poolToken", address(poolToken));
     }
 
     function create() private {
         address[] memory tokens = new address[](3);
-        tokens[0] = address(eUSD);
+        address[] memory ratePrivder = new address[](3);
+
+        tokens[0] = address(eulUSD);
         tokens[1] = address(USDC);
         tokens[2] = address(DAI);
 
-        address[] memory ratePrivder = new address[](3);
-        ratePrivder[0] = address(0);
-        ratePrivder[1] = address(new WrappedRateProvider(USDC_FEED));
-        ratePrivder[2] = address(new WrappedRateProvider(DAI_FEED));
+        // sort tokens
+        tokens = bubbleSort(tokens);
+
+        // align oracles
+        ratePrivder[0] = assetToOracle[tokens[0]];
+        ratePrivder[1] = assetToOracle[tokens[1]];
+        ratePrivder[2] = assetToOracle[tokens[2]];
 
         balancerAdapter.createPool(tokens, ratePrivder);
+    }
+
+    function bubbleSort(
+        address[] memory array
+    ) private pure returns (address[] memory) {
+        bool done = false;
+        while (!done) {
+            done = true;
+            for (uint i = 1; i < array.length; i++) {
+                if (array[i - 1] > array[i]) {
+                    done = false;
+                    address tmp = array[i - 1];
+                    array[i - 1] = array[i];
+                    array[i] = tmp;
+                }
+            }
+        }
+        return array;
     }
 }
