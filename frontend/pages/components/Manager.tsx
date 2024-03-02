@@ -4,17 +4,21 @@ import { HStack, Heading, VStack } from "@chakra-ui/layout"
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu"
 import { ChevronDownIcon } from "@chakra-ui/icons"
 import LeverageSlider from "./Slider/LeverageSlider"
-import { useState } from "react"
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box } from "@chakra-ui/react"
-import { Pool, PoolAsset, payAssets } from "../src/constants"
+import { useEffect, useState } from "react"
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box, Text } from "@chakra-ui/react"
+import { Pool, PoolAsset } from "../src/constants"
 import { PoolDetailsVStack } from "./Pools"
+import { useAccount } from "wagmi"
+import { formatNumber } from "../src/formatters"
 
 interface ManagerProps {
   selectedPool: Pool
+  prices: Record<string, number> | null
 }
 
 const Manager: React.FC<ManagerProps> = ({
-  selectedPool
+  selectedPool,
+  prices
 }: ManagerProps) => {
 
   const [leverage, setLeverage] = useState(1)
@@ -23,8 +27,20 @@ const Manager: React.FC<ManagerProps> = ({
   const maxLeverage = 10
   const outputValue = inputValue ? (Math.round((Number(inputValue) * leverage) * 10000) / 10000).toString() : "0"
 
-  const [payAsset, setPayAsset] = useState<PoolAsset | null>(payAssets[0])
+  const [payAsset, setPayAsset] = useState<PoolAsset>(selectedPool.assets[0])
 
+  useEffect(() => {
+    setPayAsset(selectedPool.assets[0])
+  }, [selectedPool])
+
+  const account = useAccount()
+
+  const userNotConnected = !account.address
+  const noInputValue = inputValue === "" || inputValue === "0"
+
+  const payAssetPrice = prices ? prices[payAsset.symbol] : 0
+  const dollarValue = inputValue ? Number(inputValue) * payAssetPrice : 0
+  
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
       <Heading as='h2' size='lg' fontWeight={300}>
@@ -37,103 +53,143 @@ const Manager: React.FC<ManagerProps> = ({
         w="100%"
         gap="1em"
       >
-        <HStack
+        <VStack
           w="100%"
           p="1em"
           borderRadius="0.5em"
-          justifyContent="space-between"
           background="white"
+          gap="0.5em"
         >
-          <Input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            border="none"
-            _focusVisible={{
-              outline: "none",
-            }}
-            w="50%"
-            type="number"
-            p="0"
-            h="fit-content"
-            fontSize="1.5em"
-            placeholder="Insert Amount"
-            cursor="pointer"
-          />
-          <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
-              minW="35%"
-              border="1px solid #e7e7e7"
-              background="transparent"
-              _hover={{
-                background: "#e7e7e7",
-              }}
-              _active={{
+          <HStack
+            w="100%"
+            justifyContent="space-between"
+          >
+            <Text lineHeight={1} fontSize="0.8em">
+              Pay with
+            </Text>
+            {
+              inputValue &&
+              <Text lineHeight={1} fontSize="0.8em">
+                {`$${formatNumber(dollarValue)}`}
+              </Text>
+            }
+          </HStack>
+          <HStack
+            w="100%"
+            justifyContent="space-between"
+          >
+            <Input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              border="none"
+              _focusVisible={{
                 outline: "none",
-                background: "#e7e7e7",
               }}
-            >
-              {
-                payAsset ? (
-                  <HStack w="100%">
-                    <Avatar src={payAsset.icon} name={payAsset.name} size="2xs" />
-                    <div>
-                      {payAsset.symbol}
-                    </div>
-                  </HStack>
-                ) : "Select Asset"
-              }
-            </MenuButton>
-            <MenuList zIndex={999} minW="0">
-              {
-                payAssets.map((asset) => (
-                  <MenuItem
-                    key={asset.symbol}
-                    onClick={() => setPayAsset(asset)}
-                    gap="0.5em"
-                  >
-                    <Avatar src={asset.icon} name={asset.name} size="2xs" />
-                    {asset.symbol}
-                  </MenuItem>
-                ))
-              }
-            </MenuList>
-          </Menu>
-        </HStack>
+              w="50%"
+              type="number"
+              p="0"
+              h="fit-content"
+              fontSize="1.5em"
+              placeholder="Insert Amount"
+              cursor="pointer"
+            />
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                minW="35%"
+                border="1px solid #e7e7e7"
+                background="transparent"
+                _hover={{
+                  background: "#e7e7e7",
+                }}
+                _active={{
+                  outline: "none",
+                  background: "#e7e7e7",
+                }}
+                height="auto"
+                padding="0.5em"
+              >
+                {
+                  payAsset ? (
+                    <HStack w="100%">
+                      <Avatar src={payAsset.icon} name={payAsset.name} size="2xs" />
+                      <div>
+                        {payAsset.symbol}
+                      </div>
+                    </HStack>
+                  ) : "Select Asset"
+                }
+              </MenuButton>
+              <MenuList zIndex={999} minW="0">
+                {
+                  selectedPool.assets.map((asset) => (
+                    <MenuItem
+                      key={asset.symbol}
+                      onClick={() => setPayAsset(asset)}
+                      gap="0.5em"
+                    >
+                      <Avatar src={asset.icon} name={asset.name} size="2xs" />
+                      {asset.symbol}
+                    </MenuItem>
+                  ))
+                }
+              </MenuList>
+            </Menu>
+          </HStack>
+        </VStack>
         <LeverageSlider
           value={leverage}
           maxLeverage={maxLeverage}
           tooltipSymbol={"x"}
           onChange={setLeverage}
         />
-        <HStack
+        <VStack
           w="100%"
           p="1em"
           borderRadius="0.5em"
-          justifyContent="space-between"
           background="white"
+          gap="0.25em"
         >
-          <Box
-            w="50%"
-            h="fit-content"
-            fontSize="1.5em"
+          <HStack
+            w="100%"
+            justifyContent="space-between"
           >
-            {outputValue}
-          </Box>
-          <HStack>
+            <Text lineHeight={1} fontSize="0.8em">
+              Receive
+            </Text>
             {
-              selectedPool.assets.map((asset, index) => (
-                <Avatar
-                  key={index}
-                  src={asset.icon}
-                  name={asset.name}
-                  size="xs"
-                />
-              ))
+              inputValue &&
+              <Text lineHeight={1} fontSize="0.8em">
+                $1,123.12
+              </Text>
             }
           </HStack>
-        </HStack>
+          <HStack
+            w="100%"
+            justifyContent="space-between"
+          >
+            <Box
+              w="50%"
+              h="fit-content"
+              fontSize="1.5em"
+            >
+              {outputValue}
+            </Box>
+            <HStack>
+              {
+                selectedPool.assets.map((asset, index) => (
+                  <Avatar
+                    key={index}
+                    src={asset.icon}
+                    name={asset.name}
+                    size="xs"
+                  />
+                ))
+              }
+            </HStack>
+          </HStack>
+        </VStack>
         <Accordion w="100%" allowToggle defaultIndex={[0]} background="white" border="none" borderRadius="0.5em">
           <AccordionItem border="none">
             <h2>
@@ -161,10 +217,11 @@ const Manager: React.FC<ManagerProps> = ({
         </Accordion>
         <Button
           w="100%"
-          background="black"
+          background="#2b2b2b"
           color="white"
+          isDisabled={userNotConnected || noInputValue}
           _hover={{
-            background: "#2b2b2b",
+            background: "black",
           }}
           _active={{
             background: "black",
@@ -172,8 +229,17 @@ const Manager: React.FC<ManagerProps> = ({
           _focus={{
             outline: "none",
           }}
+          _disabled={{
+            background: "#818181",
+            cursor: "not-allowed",
+          }}
+          onClick={() => console.log("Create Position")}
         >
-          Create Position
+          {
+            userNotConnected ? "Connect Wallet" :
+            noInputValue ? "Insert Amount" :
+            "Create Position"
+          }
         </Button>
       </VStack>
     </VStack>
