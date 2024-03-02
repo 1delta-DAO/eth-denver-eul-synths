@@ -4,6 +4,7 @@ import { sepolia } from "viem/chains"
 import { BalancerAdapter__factory, EVC__factory, MintableVault__factory } from "../src/abis/types"
 import { COLLATERAL_VAULT, DEPLOYED_ADAPTER, DEPLOYED_EVC, MINTABLE_VAULT } from "../src/constants"
 import { parseUnits, zeroAddress } from 'viem'
+import { waitForTransactionReceipt } from "viem/actions"
 
 export const useCallBatch = () => {
 
@@ -78,14 +79,19 @@ export const useCallBatch = () => {
         data: callBalancer
       }
     ]
-    const hash = await writeContractAsync({
-      abi: evcAbi,
-      address: DEPLOYED_EVC,
-      functionName: 'batch',
-      chainId: sepolia.id,
-      args: [
-        items
-      ],
-    })
+    try {
+      const hash = await writeContractAsync({
+        abi: evcAbi,
+        address: DEPLOYED_EVC,
+        functionName: 'batch',
+        chainId: sepolia.id,
+        args: [
+          items
+        ],
+      })
+      await waitForTransactionReceipt(client, { hash })
+    } catch (e: any) {
+      console.error(e)
+    }
   }
 }

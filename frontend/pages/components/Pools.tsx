@@ -1,5 +1,5 @@
 import { Grid, Heading } from "@chakra-ui/layout"
-import { Pool, pools } from "../src/constants"
+import { Pool, dexs, pools } from "../src/constants"
 import { Avatar, Box, HStack, VStack, Text } from "@chakra-ui/react"
 import { formatNumber, formatRatioToPercent } from "../src/formatters"
 
@@ -38,6 +38,17 @@ export const PoolDetailsVStack = ({
             <Text>{formatNumber(pool.totalSupply)}</Text>
           </HStack>
         )
+      }
+      {
+        pool.dex &&
+        <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
+          <Text>DEX</Text>
+          <Avatar
+            src={dexs.find((dex) => dex.name === pool.dex)?.icon}
+            name={pool.dex}
+            size="xs"
+          />
+        </HStack>
       }
     </VStack>
   )
