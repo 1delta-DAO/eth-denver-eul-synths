@@ -29,7 +29,7 @@ const Manager: React.FC<ManagerProps> = ({
   const [inputValue, setInputValue] = useState<string>("")
 
   const maxLeverage = 10
-  const outputValue = 
+  const outputValue =
     inputValue ? Math.round((Number(inputValue) * leverage * 0.9988) * 100000) / 100000 : 0
 
   const [payAsset, setPayAsset] = useState<PoolAsset>(selectedPool.assets[0])
@@ -73,7 +73,7 @@ const Manager: React.FC<ManagerProps> = ({
       if (approved && account.address) {
         const depo = Number(inputValue ?? '0')
         setTxLoading(true)
-        await batch(depo, (leverage - 1) * depo)
+        await batch(depo, (leverage - 1) * depo, payAsset)
         setTxLoading(false)
       }
     }
