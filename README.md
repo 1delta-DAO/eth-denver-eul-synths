@@ -48,8 +48,8 @@ Balancer for instance allowed us to select from a multitude of Stable Pools, eac
 ## How does it fit into DeFI
 
 eulSynths unites the most complex DeFi projects to a set of easy-to-use yield products. 
-- Our platform allows for high leverages on any tokenied DEX/AMM liquidity
-- We allow creations of synthetic assets in a decentralized manner
+- Our platform allows for high leverages on any tokenized DEX/AMM liquidity that leaves regular LSD staking APRs in the dust
+- We allow the creation of synthetic assets in a decentralized manner that instantly bootstraps deep on-chain liquidity - We can onboard any assets like eulUSD (as in our MVP), eulLTC and eulDOGE
 
 ## How does it leverage ChainLink
 
@@ -62,6 +62,8 @@ eulSynths leverages ChainLink oracles in multiple ways.
 eulSynths provides the first working MVP of a Euler-native synthetic stablecoin. 
 
 Conceptually this is easy to extend to any asset by just using a specific rate provider (e.g. ChainLink's LTC-USD feed) to issue other synthetic assets (e.g. eulLTC).
+
+This is done by defining a vault that allows for minting and burning as borrow and repay mechanic and stabilazation of on-chain swaps through Balancer's Composed Stable Pools (CSPs).
 
 Obviously one could also just use a regular borrow compatible vault (VaultREgularBorrowable already does that) for something like WETH or ETH and then use the BalancerAdapter to leverage the wstETH/ETH liquidity of Balancer by 10x.
 
