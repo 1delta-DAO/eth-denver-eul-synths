@@ -78,7 +78,6 @@ const Manager: React.FC<ManagerProps> = ({
       }
     }
   }
-
   const balanceResult = useBalance({
     token: payAsset.address as `0x${string}`,
     address: account.address as `0x${string}`,
@@ -86,9 +85,7 @@ const Manager: React.FC<ManagerProps> = ({
   })
 
   const balance =
-    balanceResult.data?.symbol === payAsset.symbol ||
-      balanceResult.data?.symbol === "DAI Stablecoin" ?
-      parseBigInt(balanceResult.data.value, payAsset.decimals) :
+    balanceResult?.data?.value ? parseBigInt(balanceResult.data.value, payAsset.decimals) :
       0
 
   const insufficientBalance = balance === 0 || Number(inputValue) > balance
