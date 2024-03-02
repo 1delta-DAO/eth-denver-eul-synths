@@ -2,10 +2,6 @@
 
 pragma solidity ^0.8.19;
 
-import {Test} from "forge-std/Test.sol";
-import "forge-std/console.sol";
-import {ICSPFactory} from "../../src/balancer-adapter/interfaces/ICSPFactory.sol";
-import {IBalancerVaultGeneral} from "../../src/balancer-adapter/interfaces/IVaultGeneral.sol";
 import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
 import {IBalancerPool} from "../../src/balancer-adapter/interfaces/IBalancerPool.sol";
 import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
@@ -37,11 +33,8 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
     constructor() {
         // stablecoins creation, they already mint to the caller
         USDC = new ERC20Mintable("USDC", "USD Coin", 6);
-        console.log("USDC", address(USDC));
         eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
-        console.log("eulUSD", address(eulUSD));
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
-        console.log("DAI", address(DAI));
 
         eulUSD.mint(address(this), 1_000_000.0e18);
         USDC.mint(address(this), 2_000_000.0e6);
@@ -92,7 +85,6 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         // transfer ownership
         eulUSD.transferOwnership(address(mintableVault));
 
-        console.log("setCollateralFactor");
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
         mintableVault.setCollateralFactor(address(collateralVault), 90); // cf = 0.9
     }
