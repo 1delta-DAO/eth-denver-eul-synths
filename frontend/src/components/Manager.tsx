@@ -13,6 +13,7 @@ import { formatNumber, parseBigInt } from "../formatters"
 import useApprove from "../hooks/useApprove"
 import useCallBatch from "../hooks/useCallBatch"
 import { sepolia } from "viem/chains"
+import useDevice from "../hooks/useDevice"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -90,24 +91,26 @@ const Manager: React.FC<ManagerProps> = ({
 
   const insufficientBalance = balance === 0 || Number(inputValue) > balance
 
+  const {isMobile} = useDevice()
+
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
-      <Heading as='h2' size='lg' fontWeight={300}>
+      <Heading as='h2' size={isMobile ? 'md' : 'lg'} fontWeight={300}>
         Create Leveraged Position
       </Heading>
       <VStack
-        padding="1em"
+        padding={isMobile ? "0.75em" : "1em"}
         background="#e7e7e7"
         borderRadius="0.5em"
         w="100%"
-        gap="1em"
+        gap={isMobile ? "0.75em" : "1em"}
       >
         <VStack
           w="100%"
           p="1em"
           borderRadius="0.5em"
           background="white"
-          gap="0.5em"
+          gap={"0.5em"}
         >
           <HStack
             w="100%"
@@ -153,7 +156,7 @@ const Manager: React.FC<ManagerProps> = ({
               type="number"
               p="0"
               h="fit-content"
-              fontSize="1.5em"
+              fontSize={isMobile ? "1.3em" : "1.5em"}
               placeholder="Insert Amount"
               cursor="pointer"
             />
@@ -172,7 +175,7 @@ const Manager: React.FC<ManagerProps> = ({
                   background: "#e7e7e7",
                 }}
                 height="auto"
-                padding="0.5em"
+                padding={isMobile ? "0.25em" : "0.5em"}
               >
                 {
                   payAsset ? (

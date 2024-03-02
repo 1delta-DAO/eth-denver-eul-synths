@@ -2,6 +2,7 @@ import { Grid, Heading } from "@chakra-ui/layout"
 import { Pool, dexs, pools } from "../constants"
 import { Avatar, Box, HStack, VStack, Text } from "@chakra-ui/react"
 import { formatNumber, formatRatioToPercent } from "../formatters"
+import useDevice from "../hooks/useDevice"
 
 interface PoolDetailsVStackProps {
   pool: Pool,
@@ -13,8 +14,10 @@ export const PoolDetailsVStack = ({
   style
 }: PoolDetailsVStackProps) => {
 
+  const {isTabletMedium, isMobile} = useDevice()
+
   return (
-    <VStack w="100%" style={style} fontSize="0.9em">
+    <VStack w="100%" style={style} fontSize={isTabletMedium ? "0.8em" : "0.9em"} gap={isMobile ? "0.25em" : ""}>
       <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
         <Text>APR</Text>
         <Text>{formatRatioToPercent(pool.apr)}</Text>
@@ -66,9 +69,11 @@ const PoolCard: React.FC<PoolCardProps> = ({
   pool
 }: PoolCardProps) => {
 
+  const {isTabletMedium, isMobile} = useDevice()
+
   return (
     <Box
-      p="1em"
+      p={isMobile ? "0.75em" : "1em"}
       borderRadius="0.5em"
       bg={isSelected ? "#2b2b2b" : "#e7e7e7"}
       cursor={isSelected ? "default" : "pointer"}
@@ -93,9 +98,10 @@ const PoolCard: React.FC<PoolCardProps> = ({
         <HStack
           w="100%"
           justifyContent="space-between"
-          fontSize="1.5em"
+          fontSize={isMobile ? "1.35em" : "1.5em"}
+          lineHeight={isMobile ? 1 : "normal"}
         >
-          <Text>
+          <Text fontSize={isTabletMedium ? "0.9em" : ""}>
             {pool.assets.map((asset) => asset.symbol).join("-")}
           </Text>
           <HStack gap="0" marginRight={pool.assets.length * -0.15 + "em"}>
@@ -130,6 +136,8 @@ const Pools: React.FC<PoolsProps> = ({
   selectedPool,
   setPool
 }: PoolsProps) => {
+
+  const {isMobile} = useDevice()
   
   return (
     <VStack
@@ -137,11 +145,11 @@ const Pools: React.FC<PoolsProps> = ({
       gap="1em"
       alignItems="flex-start"
     >
-      <Heading as='h2' size='lg' fontWeight={300}>
+      <Heading as='h2' size={isMobile ? 'md' : 'lg'} fontWeight={300}>
         Select Pool
       </Heading>
       <Grid
-        templateColumns="repeat(2, 1fr)"
+        templateColumns={isMobile ? "repeat(1, 1fr)" : "repeat(2, 1fr)"}
         gap="1em"
         w="100%"
       >
