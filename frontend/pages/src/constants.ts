@@ -61,7 +61,7 @@ export const synthAssets: PoolAsset[] = [
   {
     symbol: "eulUSD",
     name: "Euler Dollar",
-    icon: "https://assets.coingecko.com/coins/images/28445/standard/0xa0d69e286b938e21cbf7e51d71f6a4c8918f482f.png",
+    icon: "./img/eulUSD.svg",
     decimals: 18,
     defaultPrice: 1.01,
     address: "0x9f5e877f7a03f50c0319a6e15289283d6a8ac2e3"

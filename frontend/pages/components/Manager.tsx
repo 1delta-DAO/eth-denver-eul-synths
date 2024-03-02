@@ -62,7 +62,7 @@ const Manager: React.FC<ManagerProps> = ({
   const executeTx = async () => {
     if (!approved && account.address) {
       setTxLoading(true)
-      await approve(account.address, Number(inputValue))
+      await approve(Number(inputValue))
       setTxLoading(false)
     }
   }

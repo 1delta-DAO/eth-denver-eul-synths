@@ -28,7 +28,7 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
 
   const allowance = asset ? parseBigInt(allowanceResult.data as bigint, asset.decimals) : 0
 
-  const approve = async (spender: `0x${string}`, amount: number) => {
+  const approve = async (amount: number) => {
     if (!client) throw new Error('Client not found')
     if (!asset) throw new Error('Asset not found')
     const bigintAmount = BigInt(amount * 10 ** asset.decimals)
@@ -39,7 +39,7 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
         functionName: 'approve',
         chainId: sepolia.id,
         args: [
-          spender,
+          "0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98",
           bigintAmount,
         ],
       })
