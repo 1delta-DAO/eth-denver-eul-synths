@@ -18,8 +18,8 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
     address public immutable balancerVault;
     address[] pooledTokens;
     // ordered arrays
-    uint256[] multipliers;
-    uint256[] decimalScales;
+    uint256[] private multipliers;
+    uint256[] private decimalScales;
     address[] oracles;
     address[] pooledTokensClean;
     uint256 BALANCER_ASSET_LENGTH;
@@ -43,6 +43,24 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         cspFactory = _cspFactory;
         balancerVault = _balancerVault;
         SUPPLY_DOWNCALING = 1;
+    }
+
+    function getDecimalScalesAndTokens()
+        external
+        view
+        returns (address[] memory _tokens, uint256[] memory _scales)
+    {
+        _tokens = pooledTokensClean;
+        _scales = decimalScales;
+    }
+
+    function getOriginalDecimalScalesAndTokens()
+        external
+        view
+        returns (address[] memory _tokens, uint256[] memory _scales)
+    {
+        _tokens = pooledTokens;
+        _scales = balancerScalingFactors;
     }
 
     function createPool(
@@ -71,7 +89,13 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         BALANCER_ASSET_LENGTH = tokens.length;
         balancerRateProviders = IBalancerPool(pool).getRateProviders();
         poolId = IBalancerPool(pool).getPoolId();
-
+        /**
+         *  Balancer CSPs add the pool token to the registered tokens
+         *  The token might be added in the middle
+         */
+        (address[] memory tokensAll, , ) = IBalancerVaultGeneral(balancerVault)
+            .getPoolTokens(poolId);
+        pooledTokens = tokensAll;
         // do a sorted insert and create mapping
         mapTokens(tokens, rateProviders);
 
@@ -93,13 +117,6 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         uint256[] memory amounts,
         address recipient
     ) external {
-        /**
-         *  Balancer CSPs add the pool token to the registered tokens
-         *  The token might be added in the middle
-         */
-        (address[] memory tokens, , ) = IBalancerVaultGeneral(balancerVault)
-            .getPoolTokens(poolId);
-        pooledTokens = tokens;
         // check the order of the tokens
 
         bytes memory userData = abi.encode(
@@ -109,7 +126,7 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
             uint256(0) // not used for init
         );
         JoinPoolRequest memory request = JoinPoolRequest(
-            tokens, // IAsset[] assets;
+            pooledTokens, // IAsset[] assets;
             fillWith(type(uint).max, 4), // uint256[] maxAmountsIn;
             userData, // bytes userData;
             false // bool fromInternalBalance;
