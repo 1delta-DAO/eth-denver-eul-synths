@@ -42,6 +42,10 @@ contract SynthDeployerTestSepolia is Test {
         console.log("this", address(this));
         console.log("adapter", address(synths.balancerAdapter()));
         console.log("evc", address(synths.evc()));
+        
+        console.log("USDC", address(synths.USDC()));
+        console.log("DAI", address(synths.DAI()));
+        console.log("eulUSD", address(synths.eulUSD()));
 
         vm.assume(caller != address(0));
         vm.assume(
