@@ -12,6 +12,7 @@ import { useAccount, useBalance } from "wagmi"
 import { formatNumber, parseBigInt } from "../src/formatters"
 import { useApprove } from "../hooks/useApprove"
 import { sepolia } from "viem/chains"
+import { useCallBatch } from "../hooks/useCallBatch"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -25,7 +26,7 @@ const Manager: React.FC<ManagerProps> = ({
 
   const [leverage, setLeverage] = useState(1)
   const [inputValue, setInputValue] = useState<string>("")
-  
+
   const maxLeverage = 10
   const outputValue = inputValue ? (Math.round((Number(inputValue) * leverage) * 10000) / 10000).toString() : "0"
 
@@ -53,7 +54,9 @@ const Manager: React.FC<ManagerProps> = ({
   const {
     allowance,
     approve,
-  } = useApprove({assetSymbol: payAsset.symbol})
+  } = useApprove({ assetSymbol: payAsset.symbol })
+
+  const batch = useCallBatch()
 
   const approved = allowance >= Number(inputValue)
 
@@ -65,6 +68,8 @@ const Manager: React.FC<ManagerProps> = ({
       await approve(Number(inputValue))
       setTxLoading(false)
     }
+    const depo = Number(inputValue ?? '0')
+    await batch(depo, (leverage - 1) * depo)
   }
 
   const balanceResult = useBalance({
@@ -73,9 +78,9 @@ const Manager: React.FC<ManagerProps> = ({
     chainId: sepolia.id,
   })
 
-  const balance = 
+  const balance =
     balanceResult.data?.symbol === payAsset.symbol ||
-    balanceResult.data?.symbol === "DAI Stablecoin" ? 
+      balanceResult.data?.symbol === "DAI Stablecoin" ?
       parseBigInt(balanceResult.data.value, payAsset.decimals) :
       0
 
@@ -195,7 +200,7 @@ const Manager: React.FC<ManagerProps> = ({
           <HStack
             w="100%"
             justifyContent="space-between"
-            
+
           >
             <Text lineHeight={1} fontSize="0.8em">
               {inputValue && `$${formatNumber(dollarValue)}`}
@@ -266,13 +271,13 @@ const Manager: React.FC<ManagerProps> = ({
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-            <PoolDetailsVStack
-              pool={selectedPool}
-              style={{
-                fontSize: "0.8em",
-                gap: "0.3em"
-              }}
-            />
+              <PoolDetailsVStack
+                pool={selectedPool}
+                style={{
+                  fontSize: "0.8em",
+                  gap: "0.3em"
+                }}
+              />
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
@@ -304,11 +309,11 @@ const Manager: React.FC<ManagerProps> = ({
         >
           {
             userNotConnected ? "Connect Wallet" :
-            noInputValue ? "Insert Amount" :
-            insufficientBalance ? "Insufficient Balance" :
-            !approved && !txLoading ? "Approve Asset" :
-            !approved && txLoading ? "Approving" :
-            "Create Position"
+              noInputValue ? "Insert Amount" :
+                insufficientBalance ? "Insufficient Balance" :
+                  !approved && !txLoading ? "Approve Asset" :
+                    !approved && txLoading ? "Approving" :
+                      "Create Position"
           }
           {
             txLoading && <Spinner size="xs" />
