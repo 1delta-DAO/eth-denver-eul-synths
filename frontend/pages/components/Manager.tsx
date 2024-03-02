@@ -5,7 +5,7 @@ import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu"
 import { ChevronDownIcon } from "@chakra-ui/icons"
 import LeverageSlider from "./Slider/LeverageSlider"
 import { useEffect, useState } from "react"
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box, Text } from "@chakra-ui/react"
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box, Spinner, Text } from "@chakra-ui/react"
 import { Pool, PoolAsset } from "../src/constants"
 import { PoolDetailsVStack } from "./Pools"
 import { useAccount } from "wagmi"
@@ -32,7 +32,14 @@ const Manager: React.FC<ManagerProps> = ({
 
   useEffect(() => {
     setPayAsset(selectedPool.assets[0])
+    setInputValue("")
+    setLeverage(1)
   }, [selectedPool])
+
+  useEffect(() => {
+    setInputValue("")
+    setLeverage(1)
+  }, [payAsset])
 
   const account = useAccount()
 
@@ -42,8 +49,23 @@ const Manager: React.FC<ManagerProps> = ({
   const payAssetPrice = prices ? prices[payAsset.symbol] : 0
   const dollarValue = inputValue ? Number(inputValue) * payAssetPrice : 0
 
-  useApprove({assetSymbol: payAsset.symbol})
-  
+  const {
+    allowance,
+    approve,
+  } = useApprove({assetSymbol: payAsset.symbol})
+
+  const approved = allowance >= Number(inputValue)
+
+  const [txLoading, setTxLoading] = useState(false)
+
+  const executeTx = async () => {
+    if (!approved && account.address) {
+      setTxLoading(true)
+      await approve(account.address, Number(inputValue))
+      setTxLoading(false)
+    }
+  }
+
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
       <Heading as='h2' size='lg' fontWeight={300}>
@@ -222,7 +244,7 @@ const Manager: React.FC<ManagerProps> = ({
           w="100%"
           background="#2b2b2b"
           color="white"
-          isDisabled={userNotConnected || noInputValue}
+          isDisabled={userNotConnected || noInputValue || txLoading}
           _hover={{
             background: "black",
           }}
@@ -236,12 +258,18 @@ const Manager: React.FC<ManagerProps> = ({
             background: "#818181",
             cursor: "not-allowed",
           }}
-          onClick={() => console.log("Create Position")}
+          onClick={executeTx}
+          gap="0.5em"
         >
           {
             userNotConnected ? "Connect Wallet" :
             noInputValue ? "Insert Amount" :
+            !approved && !txLoading ? "Approve Asset" :
+            !approved && txLoading ? "Approving" :
             "Create Position"
+          }
+          {
+            txLoading && <Spinner size="xs" />
           }
         </Button>
       </VStack>
