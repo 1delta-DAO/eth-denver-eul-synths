@@ -7,7 +7,7 @@ import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
 import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {EulSynths, VaultMintable, VaultCollateral, IEVC, ERC20Mintable} from "../../src/deployer/Deployer.sol";
 
-// run via `forge test -vv --match-test "create"`
+// forge test -vv --match-contract "SynthDeployerTest"
 contract SynthDeployerTest is Test {
     EulSynths synths;
 
