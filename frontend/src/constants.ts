@@ -125,7 +125,7 @@ export const pools: Pool[] = [
     ],
     apr: 0.13451,
     stakingApr: 0.2412,
-    tvl: 1000000,
+    tvl: 1665925,
     dex: "Curve"
   },
   {
@@ -135,8 +135,8 @@ export const pools: Pool[] = [
       symbolToAsset.eulUSD,
     ],
     apr: 0.1789,
-    tvl: 2000000,
-    totalSupply: 100000,
+    tvl: 2156927,
+    totalSupply: 658162,
     dex: "Balancer"
   },
   {
@@ -144,9 +144,9 @@ export const pools: Pool[] = [
       symbolToAsset.WBTC,
       symbolToAsset.eulLTC,
     ],
-    apr: 0.323,
-    tvl: 3000000,
-    totalSupply: 2000,
+    apr: 0.3231,
+    tvl: 3896172,
+    totalSupply: 2978,
     dex: "Balancer"
   },
   {
@@ -155,8 +155,8 @@ export const pools: Pool[] = [
       symbolToAsset.USDT,
       symbolToAsset.DAI,
     ],
-    apr: 0.4,
-    tvl: 4000000,
+    apr: 0.0712,
+    tvl: 6168239,
     dex: "Curve"
   }
 ]
