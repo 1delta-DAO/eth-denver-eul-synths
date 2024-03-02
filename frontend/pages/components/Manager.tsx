@@ -10,6 +10,7 @@ import { Pool, PoolAsset } from "../src/constants"
 import { PoolDetailsVStack } from "./Pools"
 import { useAccount } from "wagmi"
 import { formatNumber } from "../src/formatters"
+import { useApprove } from "../hooks/useApprove"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -40,6 +41,8 @@ const Manager: React.FC<ManagerProps> = ({
 
   const payAssetPrice = prices ? prices[payAsset.symbol] : 0
   const dollarValue = inputValue ? Number(inputValue) * payAssetPrice : 0
+
+  useApprove({assetSymbol: payAsset.symbol})
   
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
