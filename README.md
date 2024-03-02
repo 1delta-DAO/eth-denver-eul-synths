@@ -43,3 +43,28 @@ Balancer for instance allowed us to select from a multitude of Stable Pools, eac
 | DAI    | `0xbBF92F1A64Ad4f0292e05fd8E690fA8B872f835b`    |
 | USDC    | `0xB67881Af90F005BE8c7553793F89BDbb3FD7448f`    |
 | eulUSD    | `0x9f5E877f7a03f50C0319a6E15289283d6a8AC2E3`    |
+
+
+## How does it fit into DeFI
+
+eulSynths unites the most complex DeFi projects to a set of easy-to-use yield products. 
+- Our platform allows for high leverages on any tokenied DEX/AMM liquidity
+- We allow creations of synthetic assets in a decentralized manner
+
+## How does it leverage ChainLink
+
+eulSynths leverages ChainLink oracles in multiple ways.
+- First off, Composable Stable Pools, which are high performance AMMs that rely on Oracle swap rates. Due to their excellent impermanent loss metrics they are the ideal fit for leveraged yield farming
+- Secondly, we allow minting of synthetic assets in a manner so that it natively provides intant bootstrapped leveraged liquidiy.
+
+## How it leverages Euler
+
+eulSynths provides the first working MVP of a Euler-native synthetic stablecoin. 
+
+Conceptually this is easy to extend to any asset by just using a specific rate provider (e.g. ChainLink's LTC-USD feed) to issue other synthetic assets (e.g. eulLTC).
+
+Obviously one could also just use a regular borrow compatible vault (VaultREgularBorrowable already does that) for something like WETH or ETH and then use the BalancerAdapter to leverage the wstETH/ETH liquidity of Balancer by 10x.
+
+The deferred health check allows to facilitate this fairly efficiently
+- We can do only one-time pool creation and supply the initial deposit and borrowed amount in one function call
+- The entire stack can be executed with 1 approval and one batch call. This could be broken down more with using EIP712, using a just an off-chain signature forn the approval.
