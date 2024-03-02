@@ -1,5 +1,7 @@
 # eulSynth - Single click leveraged DEX LP
 
+Open positions now on https://eth-denver-eul-synths.vercel.app/
+
 ## Tagline
 
 eulSynths is a universal DeFi yield product platform built on Euler and Balancer.
