@@ -1,5 +1,5 @@
 import { useAccount, useReadContract, useWriteContract, useClient } from "wagmi"
-import { approveAndAllowanceAbi, symbolToAsset } from "../src/constants"
+import { DEPLOYED_ADAPTER, approveAndAllowanceAbi, symbolToAsset } from "../src/constants"
 import { sepolia } from "viem/chains"
 import { waitForTransactionReceipt } from "viem/actions"
 import { parseBigInt } from "../src/formatters"
@@ -39,11 +39,11 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
         functionName: 'approve',
         chainId: sepolia.id,
         args: [
-          "0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98",
+          DEPLOYED_ADAPTER,
           bigintAmount,
         ],
       })
-      await waitForTransactionReceipt(client, {hash})
+      await waitForTransactionReceipt(client, { hash })
       allowanceResult.refetch()
     } catch (e: any) {
       console.error(e)

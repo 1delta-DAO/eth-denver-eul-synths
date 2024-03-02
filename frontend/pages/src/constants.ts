@@ -9,6 +9,13 @@ export interface PoolAsset {
   address?: string
 }
 
+export const MINTABLE_VAULT = '0x782FCEf760286f91e8466740a77C0e00a487Ad38'
+export const COLLATERAL_VAULT = '0x544be6BA9dafCb47d29C7cdE2e7f1609cc01e724'
+
+export const DEPLOYED_EVC = '0xA347d56A33Ea46E8dCAF2Ce2De57087f8f171Bd6';
+export const DEPLOYED_SYNTHS = '0x7D5a7B529838859e90d027C0F83Ed0789c1e0DDf';
+export const DEPLOYED_ADAPTER = '0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98';
+
 export const payAssets: PoolAsset[] = [
   {
     symbol: "wstETH",

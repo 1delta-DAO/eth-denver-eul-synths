@@ -28,11 +28,15 @@ contract SynthDeployerTestSepolia is Test {
         synths = EulSynths(0x7D5a7B529838859e90d027C0F83Ed0789c1e0DDf);
     }
 
-    function test_adapter_vault(address alice) public {
-        address caller = alice;
+    function test_adapter_vault() public {
+        address caller = 0x19b04cCcEA74AE40940aFd19d1E60DA940668cf7;
+
 
         VaultMintable mintableVault = synths.mintableVault();
         VaultCollateral collateralVault = synths.collateralVault();
+
+        console.log("mintableVault", address(mintableVault));
+        console.log("collateralVault", address(collateralVault));
 
         console.log("assume");
 
