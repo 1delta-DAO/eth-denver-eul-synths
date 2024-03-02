@@ -24,23 +24,25 @@ const Manager: React.FC<ManagerProps> = ({
   prices
 }: ManagerProps) => {
 
-  const [leverage, setLeverage] = useState(1)
+  const defaultLeverage = 2
+  const [leverage, setLeverage] = useState(defaultLeverage)
   const [inputValue, setInputValue] = useState<string>("")
 
   const maxLeverage = 10
-  const outputValue = inputValue ? (Math.round((Number(inputValue) * leverage) * 10000) / 10000).toString() : "0"
+  const outputValue = 
+    inputValue ? Math.round((Number(inputValue) * leverage * 0.9988) * 100000) / 100000 : 0
 
   const [payAsset, setPayAsset] = useState<PoolAsset>(selectedPool.assets[0])
 
   useEffect(() => {
     setPayAsset(selectedPool.assets[0])
     setInputValue("")
-    setLeverage(1)
+    setLeverage(defaultLeverage)
   }, [selectedPool])
 
   useEffect(() => {
     setInputValue("")
-    setLeverage(1)
+    setLeverage(defaultLeverage)
   }, [payAsset])
 
   const account = useAccount()
@@ -67,9 +69,14 @@ const Manager: React.FC<ManagerProps> = ({
       setTxLoading(true)
       await approve(Number(inputValue))
       setTxLoading(false)
+    } else {
+      if (approved && account.address) {
+        const depo = Number(inputValue ?? '0')
+        setTxLoading(true)
+        await batch(depo, (leverage - 1) * depo)
+        setTxLoading(false)
+      }
     }
-    const depo = Number(inputValue ?? '0')
-    await batch(depo, (leverage - 1) * depo)
   }
 
   const balanceResult = useBalance({
@@ -89,7 +96,7 @@ const Manager: React.FC<ManagerProps> = ({
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
       <Heading as='h2' size='lg' fontWeight={300}>
-        Create Position
+        Create Leveraged Position
       </Heading>
       <VStack
         padding="1em"
@@ -127,7 +134,7 @@ const Manager: React.FC<ManagerProps> = ({
                   _hover={{
                     background: "transparent",
                   }}
-                  onClick={() => setInputValue(formatNumber(balance))}
+                  onClick={() => setInputValue(balance.toString())}
                 >
                   Max
                 </Button>
@@ -200,7 +207,6 @@ const Manager: React.FC<ManagerProps> = ({
           <HStack
             w="100%"
             justifyContent="space-between"
-
           >
             <Text lineHeight={1} fontSize="0.8em">
               {inputValue && `$${formatNumber(dollarValue)}`}
@@ -225,10 +231,17 @@ const Manager: React.FC<ManagerProps> = ({
         >
           <HStack
             w="100%"
-            justifyContent="space-between"
           >
             <Text lineHeight={1} fontSize="0.8em">
-              Receive
+              Deposit Pool Token to
+            </Text>
+            <Avatar
+              src="https://storage.googleapis.com/subgraph-images/1656114240805euler-transparent.png"
+              name="Euler"
+              size="2xs"
+            />
+            <Text lineHeight={1} fontSize="0.8em">
+              Euler
             </Text>
           </HStack>
           <HStack
@@ -240,7 +253,7 @@ const Manager: React.FC<ManagerProps> = ({
               h="fit-content"
               fontSize="1.5em"
             >
-              {outputValue}
+              {formatNumber(outputValue)}
             </Box>
             <HStack>
               {

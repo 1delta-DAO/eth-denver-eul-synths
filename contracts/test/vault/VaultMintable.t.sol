@@ -224,7 +224,7 @@ contract VaultMintableTest is Test {
             collateralVault.maxWithdraw(alice),
             50e18 + bobsCollateral,
             0.01e18
-        ); 
+        );
     }
 
     function test_LeverageWithBatch(address alice, address bob) public {

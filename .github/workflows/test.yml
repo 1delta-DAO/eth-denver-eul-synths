@@ -1,6 +1,10 @@
 name: test
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   FOUNDRY_PROFILE: ci
@@ -27,8 +31,10 @@ jobs:
           forge --version
           forge build --sizes
         id: build
+        working-directory: contracts
 
       - name: Run Forge tests
         run: |
-          forge test -vvv
+          forge test -vv
         id: test
+        working-directory: contracts  
