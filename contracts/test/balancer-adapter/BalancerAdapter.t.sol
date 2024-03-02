@@ -33,6 +33,7 @@ contract BalancerAdapterTest is
     IBalancerVaultGeneral balancerVault;
     address userVault;
     uint256 constant MAX_VAL = type(uint).max;
+    address balancerPool;
 
     // we use this to track all deposits for stables (with 18 decimals)
     // it provides a benchmark for USD deposit value
@@ -41,7 +42,7 @@ contract BalancerAdapterTest is
     function setUp() public {
         vm.createSelectFork({
             blockNumber: 5_388_756,
-            urlOrAlias: "https://rpc.ankr.com/eth_sepolia"
+            urlOrAlias: "https://eth-sepolia.public.blastapi.io"
         });
 
         // stablecoins creation, they already mint to the caller
@@ -63,7 +64,6 @@ contract BalancerAdapterTest is
             address(evc)
         );
         console.log("adapter", address(balancerAdapter));
-
     }
 
     function test_adapter_create_cs_pool() public {
@@ -86,9 +86,8 @@ contract BalancerAdapterTest is
         joinPool();
 
         balance = IERC20(pool).balanceOf(address(this)) - balance;
-        console.log("balance received", balance);
         // we assert that enough BPTs were minted
-        assert(balance >= 3119.0e18);
+        assert(balance >= 3000.0e18);
     }
 
     function test_adapter_pricing() public {
@@ -178,23 +177,21 @@ contract BalancerAdapterTest is
         uint[] memory amounts = new uint256[](3);
         address adapter = address(balancerAdapter);
 
-        uint eusdAmount = 1_200.0e18;
-        APPROX_PRICE_TRACKER += eusdAmount;
-        amounts[0] = eusdAmount;
-        eUSD.transfer(adapter, eusdAmount);
+        (address[] memory assets, uint[] memory scales) = balancerAdapter
+            .getDecimalScalesAndTokens();
 
-        uint usdcAmount = 1_020.0e6;
-        APPROX_PRICE_TRACKER += usdcAmount * 1e12;
-        amounts[1] = usdcAmount;
-        USDC.transfer(adapter, usdcAmount);
+        for (uint i = 0; i < assets.length; i++) {
+            uint amountRaw = (1000.0 + i * 10);
+            APPROX_PRICE_TRACKER += amountRaw * 1e18;
+            uint amount = amountRaw * scales[i];
+            amounts[i] = amount;
+            IERC20(assets[i]).transfer(adapter, amount);
+        }
 
-        uint daiAmount = 900.0e18;
-        APPROX_PRICE_TRACKER += daiAmount;
-        amounts[2] = daiAmount;
-        DAI.transfer(adapter, daiAmount);
         console.log("join");
         // deposit balances to pool
         balancerAdapter.depositTo(amounts, address(this));
+        console.log("tracked after join", APPROX_PRICE_TRACKER);
     }
 
     function init() private {
@@ -202,24 +199,24 @@ contract BalancerAdapterTest is
 
         address adapter = address(balancerAdapter);
 
-        uint eusdAmount = 10.0e18;
-        APPROX_PRICE_TRACKER += eusdAmount;
-        amounts[1] = eusdAmount;
-        eUSD.transfer(adapter, eusdAmount);
-
-        uint usdcAmount = 10.0e6;
-        APPROX_PRICE_TRACKER += usdcAmount * 1e12;
-        amounts[2] = usdcAmount;
-        USDC.transfer(adapter, usdcAmount);
-
-        uint daiAmount = 10.0e18;
-        APPROX_PRICE_TRACKER += daiAmount;
-        amounts[3] = daiAmount;
-        DAI.transfer(adapter, daiAmount);
+        (address[] memory assets, uint[] memory scales) = balancerAdapter
+            .getOriginalDecimalScalesAndTokens();
+        console.log("Pre-init");
+        for (uint i = 0; i < assets.length; i++) {
+            address token = assets[i];
+            if (token != balancerPool) {
+                uint amountRaw = (10.0 + i * 10) * 1e18;
+                uint amount = amountRaw / scales[i];
+                APPROX_PRICE_TRACKER += amountRaw;
+                amounts[i] = amount;
+                IERC20(assets[i]).transfer(adapter, amount);
+            }
+        }
 
         console.log("inititalize");
         address recipient = address(this);
         balancerAdapter.initializePool(amounts, recipient);
+        console.log("tracked after init", APPROX_PRICE_TRACKER);
     }
 
     function create() private {
@@ -234,6 +231,8 @@ contract BalancerAdapterTest is
         ratePrivder[2] = address(new WrappedRateProvider(DAI_FEED));
 
         balancerAdapter.createPool(tokens, ratePrivder);
+
+        balancerPool = balancerAdapter.pool();
     }
 
     // create same value array
