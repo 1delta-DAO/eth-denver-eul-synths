@@ -43,7 +43,7 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
         console.log("DAI", address(DAI));
 
-        eulUSD.mint(address(this), 2_000.0e18);
+        eulUSD.mint(address(this), 1_000_000.0e18);
         USDC.mint(address(this), 2_000_000.0e6);
         DAI.mint(address(this), 2_000_000.0e18);
 
@@ -90,15 +90,20 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         assetToOracle[address(DAI)] = address(
             new WrappedRateProvider(DAI_FEED)
         );
+
+        console.log("setCollateralFactor");
+        mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
+        mintableVault.setCollateralFactor(address(collateralVault), 90); // cf = 0.9
     }
 
     function faucet(address asset) external {
         if (asset == address(USDC)) {
             USDC.mint(msg.sender, 10_000.0e6);
-        }
-        if (asset == address(DAI)) {
+        } else if (asset == address(DAI)) {
             DAI.mint(msg.sender, 10_000.0e18);
-        } else revert("Invalid asset");
+        } else {
+            revert("Invalid asset");
+        }
     }
 
     function joinPool() internal {
