@@ -25,6 +25,7 @@ contract BalancerAdapterTest is
     Fiat USDC;
     Fiat eUSD;
     Fiat DAI;
+
     EthereumVaultConnector evc;
     BalancerAdapter balancerAdapter;
 
@@ -63,11 +64,6 @@ contract BalancerAdapterTest is
         );
         console.log("adapter", address(balancerAdapter));
 
-        balancerVault.setRelayerApproval(
-            address(this), // address sender,
-            address(balancerAdapter), // address relayer,
-            true // bool approved
-        );
     }
 
     function test_adapter_create_cs_pool() public {
@@ -157,7 +153,7 @@ contract BalancerAdapterTest is
         uint256 depositAmount = 10.0e6;
         address vault = userVault;
         address recipient = address(this);
-        
+
         // item definition
         items[0] = IEVC.BatchItem({
             targetContract: address(balancerAdapter),
