@@ -120,12 +120,12 @@ const Manager: React.FC<ManagerProps> = ({
             <Text lineHeight={1} fontSize="0.8em">
               Pay with
             </Text>
-            {
-              balance &&
-              <HStack>
-                <Text lineHeight={1} fontSize="0.8em">
-                  {`Balance: ${formatNumber(balance)}`}
-                </Text>
+            <HStack>
+              <Text lineHeight={1} fontSize="0.8em">
+                {`Balance: ${formatNumber(balance)}`}
+              </Text>
+              {
+                balance > 0 &&
                 <Button
                   size="xs"
                   height="auto"
@@ -138,8 +138,8 @@ const Manager: React.FC<ManagerProps> = ({
                 >
                   Max
                 </Button>
-              </HStack>
-            }
+              }
+            </HStack>
           </HStack>
           <HStack
             w="100%"
