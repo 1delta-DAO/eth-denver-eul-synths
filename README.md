@@ -1,4 +1,4 @@
-# eulSynth
+# eulSynth - Single click leveraged DEX LP
 
 ## Tagline
 
@@ -8,7 +8,7 @@ The protocol allows users to leverage DEX liquidity from protocols like Balancer
 
 - On top of LSD yields, they can also leverage their DEX yield exposure
 - The architecture allows for native miniting of synthetic assets together with direct liquidity bootstrapping via Balacner Composed Stable Pools
-
+- All of this is enabled by Euler's Ethereum Vault Connector - the batch and deferred health check allows for single click execution of leveraged AMM pools 
 
 ![Single click Leverage AMM Pools](./assets/eulSynth.png)
 
