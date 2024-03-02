@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useReadContract } from 'wagmi'
 import { optimism } from 'viem/chains'
 import { wagmiConfig } from '../_app'
+import { parseBigInt } from '../src/formatters'
 
 export const useFetchPrices = () => {
 
@@ -40,8 +41,8 @@ export const useFetchPrices = () => {
     chainId: optimism.id
   })
 
-  const wstETHRatioBigInt = wstETHRatioResult.data?.[1].toString() || "0"
-  const wstETHRatio = parseInt(wstETHRatioBigInt) / 10 ** 18
+  const wstETHRatioBigInt = wstETHRatioResult.data?.[1]
+  const wstETHRatio = parseBigInt(wstETHRatioBigInt, 18)
 
   useEffect(() => {
     const fetchAndSetPrices = async () => {
@@ -51,8 +52,8 @@ export const useFetchPrices = () => {
         contracts: priceFeedContracts,
         chainId: 1,
       })
-      const pricesBigInt = results.map((price) => price.result?.[1].toString() || "0")
-      const prices = pricesBigInt.map((price) => parseInt(price) / 10 ** 8)
+      const pricesBigInt = results.map((price) => price.result?.[1])
+      const prices = pricesBigInt.map((price) => parseBigInt(price, 8))
       const pricesObject = [
         poolAssetsWithPriceFeed.reduce((acc, asset, index) => {
           acc[asset.symbol] = prices[index]

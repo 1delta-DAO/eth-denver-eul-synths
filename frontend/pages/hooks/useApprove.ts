@@ -2,6 +2,7 @@ import { useAccount, useReadContract, useWriteContract, useClient } from "wagmi"
 import { approveAndAllowanceAbi, symbolToAsset } from "../src/constants"
 import { sepolia } from "viem/chains"
 import { waitForTransactionReceipt } from "viem/actions"
+import { parseBigInt } from "../src/formatters"
 
 interface useApproveProps {
   assetSymbol: string
@@ -25,7 +26,7 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
     ],
   })
 
-  const allowance = asset ? Number(allowanceResult.data as bigint) / 10 ** asset?.decimals : 0
+  const allowance = asset ? parseBigInt(allowanceResult.data as bigint, asset.decimals) : 0
 
   const approve = async (spender: `0x${string}`, amount: number) => {
     if (!client) throw new Error('Client not found')

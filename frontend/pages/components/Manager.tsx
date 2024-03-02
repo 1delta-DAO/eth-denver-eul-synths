@@ -8,9 +8,10 @@ import { useEffect, useState } from "react"
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Avatar, Box, Spinner, Text } from "@chakra-ui/react"
 import { Pool, PoolAsset } from "../src/constants"
 import { PoolDetailsVStack } from "./Pools"
-import { useAccount } from "wagmi"
-import { formatNumber } from "../src/formatters"
+import { useAccount, useBalance } from "wagmi"
+import { formatNumber, parseBigInt } from "../src/formatters"
 import { useApprove } from "../hooks/useApprove"
+import { sepolia } from "viem/chains"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -66,6 +67,20 @@ const Manager: React.FC<ManagerProps> = ({
     }
   }
 
+  const balanceResult = useBalance({
+    token: payAsset.address as `0x${string}`,
+    address: account.address as `0x${string}`,
+    chainId: sepolia.id,
+  })
+
+  const balance = 
+    balanceResult.data?.symbol === payAsset.symbol ||
+    balanceResult.data?.symbol === "DAI Stablecoin" ? 
+      parseBigInt(balanceResult.data.value, payAsset.decimals) :
+      0
+
+  const insufficientBalance = balance === 0 || Number(inputValue) > balance
+
   return (
     <VStack gap="1em" w="100%" alignItems="flex-start">
       <Heading as='h2' size='lg' fontWeight={300}>
@@ -88,15 +103,30 @@ const Manager: React.FC<ManagerProps> = ({
           <HStack
             w="100%"
             justifyContent="space-between"
+            height="1em"
           >
             <Text lineHeight={1} fontSize="0.8em">
               Pay with
             </Text>
             {
-              inputValue &&
-              <Text lineHeight={1} fontSize="0.8em">
-                {`$${formatNumber(dollarValue)}`}
-              </Text>
+              balance &&
+              <HStack>
+                <Text lineHeight={1} fontSize="0.8em">
+                  {`Balance: ${formatNumber(balance)}`}
+                </Text>
+                <Button
+                  size="xs"
+                  height="auto"
+                  bg="transparent"
+                  padding="0"
+                  _hover={{
+                    background: "transparent",
+                  }}
+                  onClick={() => setInputValue(formatNumber(balance))}
+                >
+                  Max
+                </Button>
+              </HStack>
             }
           </HStack>
           <HStack
@@ -162,6 +192,18 @@ const Manager: React.FC<ManagerProps> = ({
               </MenuList>
             </Menu>
           </HStack>
+          <HStack
+            w="100%"
+            justifyContent="space-between"
+            
+          >
+            <Text lineHeight={1} fontSize="0.8em">
+              {inputValue && `$${formatNumber(dollarValue)}`}
+            </Text>
+            <Text lineHeight={1} fontSize="0.8em">
+              {payAsset.name}
+            </Text>
+          </HStack>
         </VStack>
         <LeverageSlider
           value={leverage}
@@ -183,12 +225,6 @@ const Manager: React.FC<ManagerProps> = ({
             <Text lineHeight={1} fontSize="0.8em">
               Receive
             </Text>
-            {
-              inputValue &&
-              <Text lineHeight={1} fontSize="0.8em">
-                $1,123.12
-              </Text>
-            }
           </HStack>
           <HStack
             w="100%"
@@ -244,7 +280,12 @@ const Manager: React.FC<ManagerProps> = ({
           w="100%"
           background="#2b2b2b"
           color="white"
-          isDisabled={userNotConnected || noInputValue || txLoading}
+          isDisabled={
+            userNotConnected ||
+            noInputValue ||
+            txLoading ||
+            insufficientBalance
+          }
           _hover={{
             background: "black",
           }}
@@ -264,6 +305,7 @@ const Manager: React.FC<ManagerProps> = ({
           {
             userNotConnected ? "Connect Wallet" :
             noInputValue ? "Insert Amount" :
+            insufficientBalance ? "Insufficient Balance" :
             !approved && !txLoading ? "Approve Asset" :
             !approved && txLoading ? "Approving" :
             "Create Position"
