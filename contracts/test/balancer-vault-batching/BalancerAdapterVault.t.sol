@@ -104,7 +104,7 @@ contract BalancerAdapterVaultTest is
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
         mintableVault.setCollateralFactor(address(collateralVault), 80); // cf = 0.8
 
-        uint256 borrowAmount = 20e18; // poolToken
+        uint256 borrowAmount = 20e18; // eUSD
 
         address depositAsset = address(USDC);
         uint256 depositAmount = 50e6;
@@ -151,17 +151,19 @@ contract BalancerAdapterVaultTest is
         USDC.approve(address(balancerAdapter), type(uint).max);
 
         console.log("batch");
+        vm.prank(caller);
         evc.batch(items);
-        vm.stopPrank();
 
         assertEq(eUSD.balanceOf(address(mintableVault)), 0);
-        assertEq(eUSD.balanceOf(caller), borrowAmount);
+        assertEq(eUSD.balanceOf(caller), 0);
         assertEq(mintableVault.maxWithdraw(caller), 0);
         assertEq(mintableVault.debtOf(caller), borrowAmount);
-
-        assertEq(poolToken.balanceOf(address(collateralVault)), depositAmount);
-        assertEq(poolToken.balanceOf(caller), 100e18 - depositAmount);
-        assertEq(collateralVault.maxWithdraw(caller), depositAmount);
+        assertEq(poolToken.balanceOf(caller), 0);
+        
+        uint collateralBalance = poolToken.balanceOf(address(collateralVault));
+        uint256 poolTokenAmountInUSDC = balancerAdapter.getQuote(collateralBalance, address(0), address(USDC));
+        uint256 usdAmountDepositAndBorrow = (borrowAmount + depositAmount * 10 ** (eUSD.decimals() - IERC20(depositAsset).decimals())) /  10 ** (eUSD.decimals() - USDC.decimals());
+        assertApproxEqRel(poolTokenAmountInUSDC, usdAmountDepositAndBorrow, 0.01e18);
     }
 
     function joinPool() internal {
