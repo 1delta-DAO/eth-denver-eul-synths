@@ -5,31 +5,30 @@
 eulSynths is a universal DeFi yield product platform built on Euler and Balancer.
 
 The protocol allows users to leverage DEX liquidity from protocols like Balancer to multiply their intrinsic yield. This has applications across multiple domains:
-
-- On top of LSD yields, they can also leverage their DEX yield exposure
-- The architecture allows for native miniting of synthetic assets together with direct liquidity bootstrapping via Balacner Composed Stable Pools
-- All of this is enabled by Euler's Ethereum Vault Connector - the batch and deferred health check allows for single click execution of leveraged AMM pools 
+- On top of LSD yields, they can also leverage their DEX yield exposure.
+- The architecture allows for native minting of synthetic assets together with direct liquidity bootstrapping via Balancer's Composable Stable Pools.
+- All of this is enabled by Euler's Ethereum Vault Connector - the batch and deferred health check allow for single-click execution of leveraged AMM pools without looping.
 
 ![Single click Leverage AMM Pools](./assets/eulSynth.png)
 
 ## What problems do we solve
 
-Getting optimal yield has been very duifficult in the past. A multitude of synthetic assets and derivatives (especially LSDs) allow for multiple variations of generating income.
+Getting optimal yield has been very difficult in the past. A multitude of synthetic assets and derivatives (especially LSDs) allow for multiple variations of generating income.
 
-One could either add it to DEX pools to earn fees on the high volumes or just leverage them up on lending protocol.
+One could either add them to DEX pools to earn fees on the high volumes or leverage them on lending protocols.
 eulSynth is the first protocol that allows for flexible and dynamic onboarding of DEX liquidity.
 
 ## Challenges
 
 Balancer and Euler are both highly composable protocols, however, their composability comes with a high degree of complexity.
 
-Balancer for instance allowed us to select from a multitude of Stable Pools, each of which have highly specific parametrizations. On top of that, Euler's implementation of the Vault Connector is ebntirely new, as such, we had to take a long time to even just understand how we could make them work together.
+Balancer for instance allowed us to select from a multitude of Stable Pools, each of which have highly specific parameterizations. On top of that, Euler's implementation of the Vault Connector is entirely new, as such, we had to take a long time to even just understand how we could make them work together.
 
 ## Technologies 
 
-- Synthetic assets enabled by ChainLink's price feeds
-- Balancer's Composable Stable Pools (which are also oracle-based)
-- Euler's Ethereum Vault Connector that allows for flexible batching and single-click leveraged Balancer DEX liquidity provision
+- Synthetic assets enabled by Chainlink's price feeds.
+- Balancer's Composable Stable Pools (which are also oracle-based).
+- Euler's Ethereum Vault Connector that allows for flexible batching and single-click leveraged Balancer DEX liquidity provision.
 
 ## Contracts
 The contracts are deployed on Ethereum Sepolia testnet.
@@ -61,25 +60,25 @@ The contract tests were implemented with forge. To run the tests, move into the 
 ## How does it fit into DeFI
 
 eulSynths unites the most complex DeFi projects to a set of easy-to-use yield products. 
-- Our platform allows for high leverages on any tokenized DEX/AMM liquidity that leaves regular LSD staking APRs in the dust
-- We allow the creation of synthetic assets in a decentralized manner that instantly bootstraps deep on-chain liquidity - We can onboard any assets like eulUSD (as in our MVP), eulLTC and eulDOGE
+- Our platform allows for high leverages on any tokenized DEX/AMM liquidity that leaves regular LSD staking APRs in the dust.
+- We allow the creation of synthetic assets in a decentralized manner that instantly bootstraps deep on-chain liquidity - We can onboard any assets like eulUSD (as in our MVP), eulLTC and eulDOGE.
 
 ## How does it leverage ChainLink
 
 eulSynths leverages ChainLink oracles in multiple ways.
-- First off, Composable Stable Pools, which are high performance AMMs that rely on Oracle swap rates. Due to their excellent impermanent loss metrics they are the ideal fit for leveraged yield farming
-- Secondly, we allow minting of synthetic assets in a manner so that it natively provides intant bootstrapped leveraged liquidiy.
+- First off, it does so in the form of Composable Stable Pools, which are high-performance AMMs that rely on oracle swap rates. Due to their excellent impermanent loss metrics they are the ideal fit for leveraged yield farming.
+- Secondly, we allow the minting of synthetic assets in such a manner that it natively provides instant, bootstrapped leveraged liquidity.
 
 ## How it leverages Euler
 
 eulSynths provides the first working MVP of a Euler-native synthetic stablecoin. 
 
-Conceptually this is easy to extend to any asset by just using a specific rate provider (e.g. ChainLink's LTC-USD feed) to issue other synthetic assets (e.g. eulLTC).
+Conceptually this is easy to extend to any asset by just using a specific rate provider (e.g. Chainlink's LTC-USD feed) to issue other synthetic assets (e.g. eulLTC).
 
 This is done by defining a vault that allows for minting and burning as borrow and repay mechanic and stabilazation of on-chain swaps through Balancer's Composed Stable Pools (CSPs).
 
-Obviously one could also just use a regular borrow compatible vault (VaultREgularBorrowable already does that) for something like WETH or ETH and then use the BalancerAdapter to leverage the wstETH/ETH liquidity of Balancer by 10x.
+Obviously one could also just use a regular borrow compatible vault (VaultRegularBorrowable already does that) for something like WETH or ETH and then use the BalancerAdapter to leverage the wstETH/ETH liquidity of Balancer by 10x.
 
-The deferred health check allows to facilitate this fairly efficiently
-- We can do only one-time pool creation and supply the initial deposit and borrowed amount in one function call
-- The entire stack can be executed with 1 approval and one batch call. This could be broken down more with using EIP712, using a just an off-chain signature forn the approval.
+The deferred health check allows to facilitate this fairly efficiently:
+- We can do only one-time pool creation and supply the initial deposit and borrowed amount in one function call.
+- The entire stack can be executed with one approval and one batch call. This could be broken down more with using EIP712, using an off-chain signature for the approval.
