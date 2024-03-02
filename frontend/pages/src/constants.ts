@@ -6,6 +6,7 @@ export interface PoolAsset {
   decimals: number
   priceFeedAddress?: string
   defaultPrice?: number
+  address?: string
 }
 
 export const payAssets: PoolAsset[] = [
@@ -42,7 +43,8 @@ export const payAssets: PoolAsset[] = [
     name: "Tether",
     icon: "https://static-00.iconduck.com/assets.00/tether-cryptocurrency-icon-2048x2048-dp13oydi.png",
     decimals: 6,
-    priceFeedAddress: "0x3E7d1eAB13ad0104d2750B8863b489D65364e32D"
+    priceFeedAddress: "0x3E7d1eAB13ad0104d2750B8863b489D65364e32D",
+    address: "0xaa8e23fb1079ea71e0a56f48a2aa51851d8433d0"
   },
   {
     symbol: "WBTC",
@@ -121,5 +123,56 @@ export const pools: Pool[] = [
     ],
     apr: 0.4,
     tvl: 4000000,
+  }
+]
+
+export const approveAndAllowanceAbi = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ]
