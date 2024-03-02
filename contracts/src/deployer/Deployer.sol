@@ -36,9 +36,14 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
         eulUSD = new ERC20Mintable("eulUSD", "Euler Vault Dollars", 18);
         DAI = new ERC20Mintable("DAI", "DAI Stablecoin", 18);
 
+        // mint
         eulUSD.mint(address(this), 1_000_500.0e18);
         USDC.mint(address(this), 2_000_000.0e6);
         DAI.mint(address(this), 2_000_000.0e18);
+
+        // transfer to sender
+        DAI.transfer(msg.sender, 100_000.0e6);
+        DAI.transfer(msg.sender, 100_000.0e18);
 
         // EVC
         evc = new EthereumVaultConnector();
