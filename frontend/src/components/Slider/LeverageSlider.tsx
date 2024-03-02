@@ -1,5 +1,6 @@
 import { HStack, VStack } from "@chakra-ui/react"
 import DecimalSlider from "."
+import useDevice from "../../hooks/useDevice"
 
 const SliderContainer = ({
   children,
@@ -8,11 +9,12 @@ const SliderContainer = ({
   children: React.ReactNode,
   style?: React.CSSProperties
 }) => {
+  const {isMobile} = useDevice()
   return (
     <VStack
       w="100%"
       p="0.75rem"
-      gap="0.75rem"
+      gap={isMobile ? "0.5rem" : "0.75rem"}
       borderRadius="0.5rem"
       style={style}
       background="white"
@@ -59,6 +61,7 @@ const LeverageSlider: React.FC<LeverageSliderProps> = ({
 }: LeverageSliderProps) => {
 
   const label = "Leverage"
+  const {isMobile} = useDevice()
 
   return (
     <SliderContainer style={style}>
@@ -75,6 +78,7 @@ const LeverageSlider: React.FC<LeverageSliderProps> = ({
       <HStack
         w="100%"
         justifyContent="space-between"
+        fontSize={isMobile ? "0.8em" : ""}
       >
         <MarginTag style={{ gap: "0.3em", alignItems: "center" }}>
           <span style={{ lineHeight: "normal" }}>

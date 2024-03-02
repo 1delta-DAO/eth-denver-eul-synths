@@ -4,16 +4,19 @@ import styles from '../styles/Home.module.css';
 import Navbar from '../src/components/Navbar';
 import Pools from '../src/components/Pools';
 import Manager from '../src/components/Manager';
-import { HStack } from '@chakra-ui/react';
+import { HStack, VStack } from '@chakra-ui/react';
 import { Pool, pools } from '../src/constants';
 import { useState } from 'react';
 import { useFetchPrices } from '../src/hooks/useFetchPrices';
+import useDevice from '../src/hooks/useDevice';
 
 const Home: NextPage = () => {
 
   const [pool, setPool] = useState<Pool>(pools[0]);
 
   const prices = useFetchPrices()
+
+  const {isDesktop, isMobile} = useDevice()
 
   return (
     <div>
@@ -27,29 +30,56 @@ const Home: NextPage = () => {
 
       <Navbar />
 
-      <HStack
-        minH='100vh'
-        w='100%'
-        maxW="1400px"
-        m="auto"
-        mt="2em"
-        gap="2em"
-        px="2em"
-        alignItems="flex-start"
-      >
-        <div className='flex flex-col w-2/3'>
+      {
+        isDesktop &&
+        <HStack
+          minH='100vh'
+          w='100%'
+          maxW="1400px"
+          m="auto"
+          mt="2em"
+          gap="2em"
+          px="2em"
+          alignItems="flex-start"
+        >
+          <div className='flex flex-col w-2/3'>
+            <Pools
+              selectedPool={pool}
+              setPool={setPool}
+            />
+          </div>
+          <div className='flex flex-col w-1/3'>
+            <Manager
+              selectedPool={pool}
+              prices={prices}
+            />
+          </div>
+        </HStack>
+      }
+
+      {
+        !isDesktop &&
+        <VStack
+          minH='100vh'
+          w='100%'
+          maxW="1400px"
+          m="auto"
+          mt={isMobile ? "1em" : "2em"}
+          gap="2em"
+          px={isMobile ? "1em" : "2em"}
+          pb={isMobile ? "3em" : "0"}
+          alignItems="flex-start"
+        >
           <Pools
             selectedPool={pool}
             setPool={setPool}
           />
-        </div>
-        <div className='flex flex-col w-1/3'>
           <Manager
             selectedPool={pool}
             prices={prices}
           />
-        </div>
-      </HStack>
+        </VStack>
+      }
 
       <footer className={styles.footer}>
         <a href="https://rainbow.me" rel="noopener noreferrer" target="_blank">
