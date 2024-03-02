@@ -14,7 +14,7 @@ export const PoolDetailsVStack = ({
 }: PoolDetailsVStackProps) => {
 
   return (
-    <VStack w="100%" style={style}>
+    <VStack w="100%" style={style} fontSize="0.9em">
       <HStack justifyContent="space-between" w="100%" fontSize="1.2em">
         <Text>APR</Text>
         <Text>{formatRatioToPercent(pool.apr)}</Text>
@@ -98,7 +98,7 @@ const PoolCard: React.FC<PoolCardProps> = ({
           <Text>
             {pool.assets.map((asset) => asset.symbol).join("-")}
           </Text>
-          <HStack>
+          <HStack gap="0" marginRight={pool.assets.length * -0.15 + "em"}>
             {
               pool.assets.map((asset, index) => (
                 <Avatar
@@ -106,6 +106,8 @@ const PoolCard: React.FC<PoolCardProps> = ({
                   src={asset.icon}
                   name={asset.name}
                   size="xs"
+                  position="relative"
+                  left={index * -0.5 + "em"}
                 />
               ))
             }

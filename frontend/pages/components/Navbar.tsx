@@ -1,7 +1,7 @@
 import { HStack, Heading } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
-import logo from '../../public/img/eulSynth.svg'
+import logo from '../../public/img/eulSynths.svg'
 
 const Navbar = () => {
   return (
@@ -9,7 +9,7 @@ const Navbar = () => {
       <HStack>
         <Image src={logo} alt="logo" width={40} height={40} />
         <Heading as='h1' size='xl' fontWeight={300} lineHeight={1}>
-          eulSynth
+          eulSynths
         </Heading>
       </HStack>
       <ConnectButton />

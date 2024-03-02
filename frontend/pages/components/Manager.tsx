@@ -253,9 +253,9 @@ const Manager: React.FC<ManagerProps> = ({
               h="fit-content"
               fontSize="1.5em"
             >
-              {formatNumber(outputValue)}
+              ${formatNumber(outputValue)}
             </Box>
-            <HStack>
+            <HStack gap="0" marginRight={-0.5 + "em"}>
               {
                 selectedPool.assets.map((asset, index) => (
                   <Avatar
@@ -263,6 +263,8 @@ const Manager: React.FC<ManagerProps> = ({
                     src={asset.icon}
                     name={asset.name}
                     size="xs"
+                    position="relative"
+                    left={index * -0.5 + "em"}
                   />
                 ))
               }
