@@ -91,14 +91,14 @@ contract BalancerAdapterVaultTest is
     function test_adapter_vault(address alice) public {
         address caller = alice;
 
-        USDC.transfer(caller, 200e6);
-        assertEq(USDC.balanceOf(caller), 200e6);
-
         console.log("assume");
         vm.assume(caller != address(0));
         vm.assume(
             caller != address(evc) && caller != address(mintableVault) && caller != address(collateralVault)
         );
+
+        USDC.transfer(caller, 200e6);
+        assertEq(USDC.balanceOf(caller), 200e6);
 
         console.log("setCollateralFactor");
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization
@@ -147,7 +147,7 @@ contract BalancerAdapterVaultTest is
         });
 
         console.log("approve collateral"); 
-        vm.prank(alice);
+        vm.prank(caller);
         USDC.approve(address(balancerAdapter), type(uint).max);
 
         console.log("batch");
