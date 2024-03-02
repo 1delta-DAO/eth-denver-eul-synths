@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "evc/EthereumVaultConnector.sol";
-import "../../src/vaults/solmate/VaultSimple.sol";
 import {ICSPFactory, IRateProvider} from "../../src/balancer-adapter/interfaces/ICSPFactory.sol";
 import {IBalancerVault, JoinPoolRequest, IAsset, SingleSwap, SwapKind, FundManagement} from "../../src/balancer-adapter/interfaces/IVault.sol";
 import {BalancerSepoliaAddresses} from "./BalancerSepoliaAddresses.sol";

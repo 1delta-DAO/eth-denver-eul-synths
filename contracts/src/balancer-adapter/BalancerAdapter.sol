@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.19;
 
-import {IPriceOracle} from "../interfaces/IPriceOracle.sol";
+import {IPriceOracle} from "../helpers/interfaces/IPriceOracle.sol";
 import {ICSPFactoryGeneral, IRateProvider} from "./interfaces/ICSPFactory.sol";
 import {IBalancerVaultGeneral, JoinPoolRequest, SingleSwap, SwapKind, FundManagement} from "./interfaces/IVaultGeneral.sol";
 import {StablePoolUserData} from "./interfaces/StablePoolUserData.sol";

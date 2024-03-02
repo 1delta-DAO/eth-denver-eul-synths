@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {IMinimalVault} from "../../src/balancer-adapter/interfaces/IMinimalVault.sol";
 import {IERC20} from "../../src/balancer-adapter/interfaces/IERC20.sol";
-import "../../lib/ethereum-vault-connector/src/utils/EVCUtil.sol";
+import "ethereum-vault-connector/src/utils/EVCUtil.sol";
 import "forge-std/console.sol";
 
 contract MockVault is IMinimalVault, EVCUtil {

@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 import "openzeppelin/interfaces/IERC4626.sol";
-import "../../src/ERC20/ERC20CollateralWrapper.sol";
-import "../../src/interfaces/IPriceOracle.sol";
+import "../../src/helpers/ERC20/ERC20CollateralWrapper.sol";
+import "../../src/helpers/interfaces/IPriceOracle.sol";
 
 contract PriceOracleMock is IPriceOracle {
     uint256 internal constant ADDRESS_MASK = (1 << 160) - 1;

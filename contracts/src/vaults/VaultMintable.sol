@@ -2,33 +2,42 @@
 
 pragma solidity ^0.8.19;
 
-import {VaultRegularBorrowable, ERC20} from "../vaults/open-zeppelin/VaultRegularBorrowable.sol";
+import {VaultRegularBorrowable, ERC20} from "../helpers/vaults/open-zeppelin/VaultRegularBorrowable.sol";
 import {ERC20Mintable} from "../ERC20/ERC20Mintable.sol";
-//import {ERC20} from "openzeppelin/token/ERC20/ERC20.sol";
-//import {ERC20} from "solmate/tokens/ERC20.sol";
-import {IEVC} from "../utils/EVCClient.sol";
-import {IIRM} from "../interfaces/IIRM.sol";
-import {IPriceOracle} from "../interfaces/IPriceOracle.sol";
+import {IEVC} from "../helpers/utils/EVCClient.sol";
+import {IIRM} from "../helpers/interfaces/IIRM.sol";
+import {IPriceOracle} from "../helpers/interfaces/IPriceOracle.sol";
 
 /// @title VaultMintable
-/// @notice This contract extends VaultSimpleBorrowable with additional features like interest rate accrual and
-/// recognition of external collateral vaults and liquidations.
+/// @notice This contract extends VaultRegularBorrowable .
 contract VaultMintable is VaultRegularBorrowable {
-
     constructor(
         IEVC _evc,
-        address  _asset,
+        address _asset,
         IIRM _irm,
         IPriceOracle _oracle,
         address _referenceAsset,
         string memory _name,
         string memory _symbol
-    ) VaultRegularBorrowable(_evc, ERC20Mintable(_asset), _irm, _oracle, ERC20(_referenceAsset), _name, _symbol) {}
+    )
+        VaultRegularBorrowable(
+            _evc,
+            ERC20Mintable(_asset),
+            _irm,
+            _oracle,
+            ERC20(_referenceAsset),
+            _name,
+            _symbol
+        )
+    {}
 
     /// @notice Borrows assets.
     /// @param assets The amount of assets to borrow.
     /// @param receiver The receiver of the assets.
-    function borrow(uint256 assets, address receiver) external override callThroughEVC nonReentrant {
+    function borrow(
+        uint256 assets,
+        address receiver
+    ) external override callThroughEVC nonReentrant {
         address msgSender = _msgSenderForBorrow();
 
         createVaultSnapshot();
@@ -43,15 +52,18 @@ contract VaultMintable is VaultRegularBorrowable {
         emit Borrow(msgSender, receiver, assets);
 
         ERC20Mintable(asset()).mint(receiver, assets);
-        
+
         requireAccountAndVaultStatusCheck(msgSender);
     }
 
     /// @notice Repays a debt.
-    /// @dev This function transfers the specified amount of assets from the caller to the vault.
+    /// @dev This function burns the specified amount of assets from the caller.
     /// @param assets The amount of assets to repay.
     /// @param receiver The receiver of the repayment.
-    function repay(uint256 assets, address receiver) external override callThroughEVC nonReentrant {
+    function repay(
+        uint256 assets,
+        address receiver
+    ) external override callThroughEVC nonReentrant {
         address msgSender = _msgSender();
 
         // sanity check: the receiver must be under control of the EVC. otherwise, we allowed to disable this vault as

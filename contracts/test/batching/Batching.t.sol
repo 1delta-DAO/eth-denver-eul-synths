@@ -14,13 +14,12 @@ import {BalancerAdapter} from "../../src/balancer-adapter/BalancerAdapter.sol";
 import {WrappedRateProvider} from "../../src/balancer-adapter/WrappedRateProvider.sol";
 
 import "evc/EthereumVaultConnector.sol";
-import {VaultMintable} from "../../src/1delta/VaultMintable.sol";
-import {VaultCollateral} from "../../src/1delta/VaultCollateral.sol";
+import {VaultMintable} from "../../src/vaults/VaultMintable.sol";
+import {VaultCollateral} from "../../src/vaults/VaultCollateral.sol";
 import {ERC20Mintable} from "../../src/ERC20/ERC20Mintable.sol";
 import {IRMMock} from "../mocks/IRMMock.sol";
 
-// run via `forge test -vv --match-test "create"`
-contract BalancerAdapterVaultTest is
+contract BatchingTest is
     Test,
     BalancerSepoliaAddresses,
     ChainLinkFeedAddresses
@@ -88,7 +87,7 @@ contract BalancerAdapterVaultTest is
         eUSD.transferOwnership(address(mintableVault));
     }
 
-    function test_adapter_vault(address alice) public {
+    function test_leverage_pool_position(address alice) public {
         address caller = alice;
 
         console.log("assume");

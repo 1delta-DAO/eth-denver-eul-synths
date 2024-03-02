@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Chainlink aggregator interface
 interface AggregatorV3Interface {
   function decimals() external view returns (uint8);
 

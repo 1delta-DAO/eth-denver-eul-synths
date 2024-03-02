@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.19;
 
-import "../../src/interfaces/IIRM.sol";
+import "../../src/helpers/interfaces/IIRM.sol";
 
 contract IRMMock is IIRM {
     uint256 internal constant SECONDS_PER_YEAR = 365.2425 * 86400; // Gregorian calendar
