@@ -22,7 +22,7 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
     chainId: sepolia.id,
     args: [
       account?.address as `0x${string}`,
-      account?.address // here goes the spender address
+      "0x3046ff18D6D0726BC9711E29DAE3A20F7C33de98" // here goes the spender address
     ],
   })
 
