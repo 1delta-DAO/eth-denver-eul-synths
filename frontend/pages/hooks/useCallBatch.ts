@@ -6,7 +6,7 @@ import { COLLATERAL_VAULT, DEPLOYED_ADAPTER, DEPLOYED_EVC, MINTABLE_VAULT, PoolA
 import { parseUnits, zeroAddress } from 'viem'
 import { waitForTransactionReceipt } from "viem/actions"
 
-export const useCallBatch = () => {
+const useCallBatch = () => {
 
   const { writeContractAsync, isPending, isError, isSuccess } = useWriteContract()
   const client = useClient()
@@ -96,3 +96,5 @@ export const useCallBatch = () => {
     }
   }
 }
+
+export default useCallBatch

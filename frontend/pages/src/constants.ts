@@ -86,8 +86,15 @@ export const synthAssets: PoolAsset[] = [
 
 export const poolAssets = [...payAssets, ...synthAssets]
 
-export const symbolToAsset = (symbol: string): PoolAsset | undefined => {
-  return poolAssets.find((asset) => asset.symbol === symbol)
+export const symbolToAsset = {
+  wstETH: poolAssets[0],
+  ETH: poolAssets[1],
+  DAI: poolAssets[2],
+  USDC: poolAssets[3],
+  USDT: poolAssets[4],
+  WBTC: poolAssets[5],
+  eulUSD: poolAssets[6],
+  eulLTC: poolAssets[7]
 }
 
 export const dexs = [
@@ -113,8 +120,8 @@ export interface Pool {
 export const pools: Pool[] = [
   {
     assets: [
-      symbolToAsset("wstETH")!,
-      symbolToAsset("ETH")!,
+      symbolToAsset.wstETH,
+      symbolToAsset.ETH,
     ],
     apr: 0.13451,
     stakingApr: 0.2412,
@@ -123,9 +130,9 @@ export const pools: Pool[] = [
   },
   {
     assets: [
-      symbolToAsset("USDC")!,
-      symbolToAsset("DAI")!,
-      symbolToAsset("eulUSD")!,
+      symbolToAsset.USDC,
+      symbolToAsset.DAI,
+      symbolToAsset.eulUSD,
     ],
     apr: 0.1789,
     tvl: 2000000,
@@ -134,8 +141,8 @@ export const pools: Pool[] = [
   },
   {
     assets: [
-      symbolToAsset("WBTC")!,
-      symbolToAsset("eulLTC")!,
+      symbolToAsset.WBTC,
+      symbolToAsset.eulLTC,
     ],
     apr: 0.323,
     tvl: 3000000,
@@ -144,9 +151,9 @@ export const pools: Pool[] = [
   },
   {
     assets: [
-      symbolToAsset("USDC")!,
-      symbolToAsset("USDT")!,
-      symbolToAsset("DAI")!,
+      symbolToAsset.USDC,
+      symbolToAsset.USDT,
+      symbolToAsset.DAI,
     ],
     apr: 0.4,
     tvl: 4000000,

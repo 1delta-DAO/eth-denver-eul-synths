@@ -8,9 +8,9 @@ interface useApproveProps {
   assetSymbol: string
 }
 
-export const useApprove = ({ assetSymbol }: useApproveProps) => {
+const useApprove = ({ assetSymbol }: useApproveProps) => {
 
-  const asset = symbolToAsset(assetSymbol)
+  const asset = symbolToAsset[assetSymbol as keyof typeof symbolToAsset]
   const account = useAccount()
   const { writeContractAsync, isPending, isError, isSuccess } = useWriteContract()
   const client = useClient()
@@ -58,3 +58,5 @@ export const useApprove = ({ assetSymbol }: useApproveProps) => {
     isSuccess,
   }
 }
+
+export default useApprove

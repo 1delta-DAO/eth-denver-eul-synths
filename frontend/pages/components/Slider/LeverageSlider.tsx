@@ -46,7 +46,7 @@ interface LeverageSliderProps {
   maxLeverage: number
   value: number
   style?: React.CSSProperties
-  tooltipSymbol?: string
+  tooltipsymbol?: string
   onChange: (value: number) => void;
 }
 
@@ -54,7 +54,7 @@ const LeverageSlider: React.FC<LeverageSliderProps> = ({
   maxLeverage,
   value,
   style,
-  tooltipSymbol,
+  tooltipsymbol,
   onChange,
 }: LeverageSliderProps) => {
 
@@ -69,8 +69,8 @@ const LeverageSlider: React.FC<LeverageSliderProps> = ({
         min={2}
         max={maxLeverage}
         step={0.1}
-        totalSliderMarks={5}
-        tooltipSymbol={tooltipSymbol}
+        totalslidermarks={5}
+        tooltipsymbol={tooltipsymbol}
       />
       <HStack
         w="100%"

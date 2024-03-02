@@ -22,6 +22,7 @@ const nextConfig = {
       }
     ],
   },
+  pageExtensions: ['tsx'],
 };
 
 module.exports = nextConfig;

@@ -10,9 +10,9 @@ import { Pool, PoolAsset } from "../src/constants"
 import { PoolDetailsVStack } from "./Pools"
 import { useAccount, useBalance } from "wagmi"
 import { formatNumber, parseBigInt } from "../src/formatters"
-import { useApprove } from "../hooks/useApprove"
+import useApprove from "../hooks/useApprove"
+import useCallBatch from "../hooks/useCallBatch"
 import { sepolia } from "viem/chains"
-import { useCallBatch } from "../hooks/useCallBatch"
 
 interface ManagerProps {
   selectedPool: Pool
@@ -219,7 +219,7 @@ const Manager: React.FC<ManagerProps> = ({
         <LeverageSlider
           value={leverage}
           maxLeverage={maxLeverage}
-          tooltipSymbol={"x"}
+          tooltipsymbol={"x"}
           onChange={setLeverage}
         />
         <VStack

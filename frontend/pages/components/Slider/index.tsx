@@ -10,8 +10,8 @@ import {
 } from '@chakra-ui/react'
 
 interface DecimalSliderProps extends SliderProps {
-  tooltipSymbol?: string
-  totalSliderMarks?: number
+  tooltipsymbol?: string
+  totalslidermarks?: number
 }
 
 const DecimalSlider: React.FC<DecimalSliderProps> = ({ value, onChange, ...props }) => {
@@ -30,14 +30,14 @@ const DecimalSlider: React.FC<DecimalSliderProps> = ({ value, onChange, ...props
   const max = props.max ?? 100;
 
   const step = 
-    !props.totalSliderMarks ?
+    !props.totalslidermarks ?
       props.step ?? 25 :
-      (max - min) / (props.totalSliderMarks - 1);
+      (max - min) / (props.totalslidermarks - 1);
 
   const steps =
-    !props.totalSliderMarks ?
+    !props.totalslidermarks ?
       step != 0 ? (max - min) / step : 0 :
-      props.totalSliderMarks - 1;
+      props.totalslidermarks - 1;
 
   return (
     <Slider
@@ -70,7 +70,7 @@ const DecimalSlider: React.FC<DecimalSliderProps> = ({ value, onChange, ...props
         color='white'
         placement='top'
         isOpen={showTooltip}
-        label={`${value?.toLocaleString()}${props.tooltipSymbol ?? "%"}`}
+        label={`${value?.toLocaleString()}${props.tooltipsymbol ?? "%"}`}
       >
         <SliderThumb bg="black" />
       </Tooltip>
