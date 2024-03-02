@@ -57,6 +57,15 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
             address(evc)
         );
 
+
+        // add oracles
+        assetToOracle[address(USDC)] = address(
+            new WrappedRateProvider(USDC_FEED)
+        );
+        assetToOracle[address(DAI)] = address(
+            new WrappedRateProvider(DAI_FEED)
+        );
+
         create();
         init();
         joinPool();
@@ -82,14 +91,6 @@ contract EulSynths is BalancerSepoliaAddresses, ChainLinkFeedAddresses {
 
         // transfer ownership
         eulUSD.transferOwnership(address(mintableVault));
-
-        // add oracles
-        assetToOracle[address(USDC)] = address(
-            new WrappedRateProvider(USDC_FEED)
-        );
-        assetToOracle[address(DAI)] = address(
-            new WrappedRateProvider(DAI_FEED)
-        );
 
         console.log("setCollateralFactor");
         mintableVault.setCollateralFactor(address(mintableVault), 0); // cf = 0, self-collateralization

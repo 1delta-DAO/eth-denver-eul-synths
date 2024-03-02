@@ -163,13 +163,6 @@ contract BalancerAdapter is IPriceOracle, EVCUtil {
         );
     }
 
-    function doCheckAccountStatus(
-        address,
-        address[] calldata
-    ) internal view virtual {
-        // no need to do anything here because the vault does not allow borrowing
-    }
-
     /**
      * pulls funds from the caller;
      */
