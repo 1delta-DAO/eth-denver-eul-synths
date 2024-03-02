@@ -7,10 +7,13 @@ import Manager from './components/Manager';
 import { HStack } from '@chakra-ui/react';
 import { Pool, pools } from './src/constants';
 import { useState } from 'react';
+import { useFetchPrices } from './hooks/useFetchPrices';
 
 const Home: NextPage = () => {
 
   const [pool, setPool] = useState<Pool>(pools[0]);
+
+  const prices = useFetchPrices()
 
   return (
     <div>
@@ -44,6 +47,7 @@ const Home: NextPage = () => {
         <div className='flex flex-col w-1/3'>
           <Manager
             selectedPool={pool}
+            prices={prices}
           />
         </div>
       </HStack>

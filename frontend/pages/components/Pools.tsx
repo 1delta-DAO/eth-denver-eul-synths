@@ -65,7 +65,7 @@ const PoolCard: React.FC<PoolCardProps> = ({
         background: "#2b2b2b",
         transform: isSelected ? "" : "scale(0.97)"
       }}
-      transition="all 0.2s ease-in-out"
+      transition="all 0.1s ease-in-out"
       onClick={() => !isSelected && setPool(pool)}
       _active={{
         transform: isSelected ? "" : "scale(0.95)"

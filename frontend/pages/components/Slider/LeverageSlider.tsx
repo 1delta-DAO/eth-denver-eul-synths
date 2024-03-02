@@ -32,10 +32,9 @@ const MarginTag = ({
 
   return (
     <HStack
-      fontWeight={400}
+      fontWeight={300}
       alignItems="center"
       justifyContent="flex-start"
-
       style={style}
     >
       {children}

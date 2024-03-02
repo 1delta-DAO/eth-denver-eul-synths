@@ -6,7 +6,7 @@ const Navbar = () => {
     <div className='w-full px-10 py-6 flex justify-between'>
       <div>
         <Heading as='h1' size='xl' fontWeight={300}>
-          eSynths
+          eulSynth
         </Heading>
       </div>
       <ConnectButton />
