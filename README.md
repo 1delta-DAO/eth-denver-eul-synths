@@ -31,7 +31,7 @@ Balancer for instance allowed us to select from a multitude of Stable Pools, eac
 - Balancer's Composable Stable Pools (which are also oracle-based)
 - Euler's Ethereum Vault Connector that allows for flexible batching and single-click leveraged Balancer DEX liquidity provision
 
-## Contracts
+## Contracts (ETH-Sepolia)
 
 | Contract    | Address |
 | -------- | ------- |
